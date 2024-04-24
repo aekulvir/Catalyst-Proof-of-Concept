@@ -1,10 +1,8 @@
-import { graphql } from '../graphql';
-
-export const PAGE_DETAILS_FRAGMENT = graphql(`
+export const PAGE_DETAILS_FRAGMENT = /* GraphQL */ `
   fragment PageDetails on PageInfo {
     hasNextPage
     hasPreviousPage
     startCursor
     endCursor
   }
-`);
+`;

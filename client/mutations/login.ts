@@ -1,7 +1,7 @@
 import { client } from '..';
-import { graphql } from '../graphql';
+import { graphql } from '../generated';
 
-const LOGIN_MUTATION = graphql(`
+export const LOGIN_MUTATION = /* GraphQL */ `
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       customer {
@@ -9,11 +9,13 @@ const LOGIN_MUTATION = graphql(`
       }
     }
   }
-`);
+`;
 
 export const login = async (email: string, password: string) => {
+  const mutation = graphql(LOGIN_MUTATION);
+
   const response = await client.fetch({
-    document: LOGIN_MUTATION,
+    document: mutation,
     variables: { email, password },
   });
 

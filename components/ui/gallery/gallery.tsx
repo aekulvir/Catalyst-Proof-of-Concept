@@ -41,10 +41,7 @@ const GalleryPreviousIndicator = forwardRef<ElementRef<'button'>, ComponentProps
     return (
       <button
         aria-label="Previous product image"
-        className={cn(
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20',
-          className,
-        )}
+        className={cn('focus:outline-none focus:ring-4 focus:ring-blue-primary/20', className)}
         onClick={(e) => {
           setSelectedImageIndex(previousIndex);
 
@@ -71,10 +68,7 @@ const GalleryNextIndicator = forwardRef<ElementRef<'button'>, ComponentPropsWith
     return (
       <button
         aria-label="Next product image"
-        className={cn(
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20',
-          className,
-        )}
+        className={cn('focus:outline-none focus:ring-4 focus:ring-blue-primary/20', className)}
         onClick={(e) => {
           setSelectedImageIndex(nextIndex);
 
@@ -204,7 +198,7 @@ const GalleryThumbnailItem = forwardRef<ElementRef<'button'>, GalleryThumbnailIt
         aria-label="Enlarge product image"
         aria-pressed={isActive}
         className={cn(
-          'inline-block h-12 w-12 flex-shrink-0 flex-grow-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 md:h-24 md:w-24',
+          'inline-block h-12 w-12 flex-shrink-0 flex-grow-0 focus:outline-none focus:ring-4 focus:ring-blue-primary/20 md:h-24 md:w-24',
           className,
         )}
         onClick={(e) => {
@@ -244,8 +238,8 @@ const GalleryThumbnail = forwardRef<ElementRef<'img'>, GalleryThumbnailProps>(
     return (
       <Comp
         className={cn(
-          'flex cursor-pointer items-center justify-center border-2 hover:border-primary',
-          isActive && 'border-primary',
+          'flex cursor-pointer items-center justify-center border-2 hover:border-blue-primary',
+          isActive && 'border-blue-primary',
           'h-full w-full object-contain',
           className,
         )}

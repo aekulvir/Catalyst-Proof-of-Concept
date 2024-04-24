@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import {
   BlogPostAuthor,
   BlogPostBanner,
@@ -11,8 +13,6 @@ import { getBlogPosts } from '~/client/queries/get-blog-posts';
 import { ExistingResultType } from '~/client/util';
 import { Link } from '~/components/link';
 
-import { BcImage } from '../bc-image';
-
 interface BlogPostCardProps {
   blogPost: ExistingResultType<typeof getBlogPosts>['posts']['items'][number];
 }
@@ -22,7 +22,7 @@ export const BlogPostCard = ({ blogPost }: BlogPostCardProps) => (
     {blogPost.thumbnailImage ? (
       <BlogPostImage>
         <Link className="block w-full" href={`/blog/${blogPost.entityId}`}>
-          <BcImage
+          <Image
             alt={blogPost.thumbnailImage.altText}
             className="h-full w-full object-cover object-center"
             height={300}
@@ -34,10 +34,10 @@ export const BlogPostCard = ({ blogPost }: BlogPostCardProps) => (
     ) : (
       <BlogPostBanner>
         <BlogPostTitle variant="inBanner">
-          <span className="line-clamp-3 text-primary">{blogPost.name}</span>
+          <span className="line-clamp-3 text-blue-primary">{blogPost.name}</span>
         </BlogPostTitle>
         <BlogPostDate variant="inBanner">
-          <span className="text-primary">
+          <span className="text-blue-primary">
             {new Intl.DateTimeFormat('en-US').format(new Date(blogPost.publishedDate.utc))}
           </span>
         </BlogPostDate>

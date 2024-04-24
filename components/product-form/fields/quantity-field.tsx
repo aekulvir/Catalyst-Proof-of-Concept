@@ -1,5 +1,3 @@
-import { useTranslations } from 'next-intl';
-
 import { Counter } from '@bigcommerce/components/counter';
 import { Label } from '@bigcommerce/components/label';
 
@@ -11,12 +9,11 @@ export const QuantityField = () => {
     rules: { required: true, min: 1 },
     defaultValue: 1,
   });
-  const t = useTranslations('Product.Form');
 
   return (
     <div className="@md:w-32">
       <Label className="mb-2 inline-block font-semibold" htmlFor="quantity">
-        {t('quantityLabel')}
+        Quantity
       </Label>
       <Counter
         id="quantity"

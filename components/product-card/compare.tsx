@@ -1,6 +1,5 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import { useEffect, useId, useState } from 'react';
 
 import { Checkbox } from '@bigcommerce/components/checkbox';
@@ -21,7 +20,6 @@ export const Compare = ({
   productName: string;
 }) => {
   const checkboxId = useId();
-  const t = useTranslations('Product.ProductSheet');
   const [checkedState, setCheckedState] = useState(false);
   const { products, setProducts } = useCompareProductsContext();
 
@@ -52,7 +50,7 @@ export const Compare = ({
         onCheckedChange={handleOnCheckedChange}
       />
       <Label className="font-normal" htmlFor={checkboxId}>
-        {t('compare')}
+        Compare
       </Label>
     </div>
   );

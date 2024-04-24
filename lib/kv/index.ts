@@ -77,15 +77,9 @@ async function createKVAdapter() {
     return new DevKvAdapter();
   }
 
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-    const { VercelKvAdapter } = await import('./adapters/vercel');
+  const { VercelKvAdapter } = await import('./adapters/vercel');
 
-    return new VercelKvAdapter();
-  }
-
-  const { NoopKvAdapter } = await import('./adapters/noop');
-
-  return new NoopKvAdapter();
+  return new VercelKvAdapter();
 }
 
 const adapterInstance = new KV(createKVAdapter, {

@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useId } from 'react';
 
 import {
@@ -13,7 +13,6 @@ import { Rating } from '@bigcommerce/components/rating';
 import { Link } from '~/components/link';
 import { cn } from '~/lib/utils';
 
-import { BcImage } from '../bc-image';
 import { Pricing } from '../pricing';
 
 import { Cart } from './cart';
@@ -74,7 +73,6 @@ interface ProductCardProps {
   imagePriority?: boolean;
   showCart?: boolean;
   showCompare?: boolean;
-  showReviews?: boolean;
 }
 
 export const ProductCard = ({
@@ -83,10 +81,8 @@ export const ProductCard = ({
   imagePriority = false,
   showCart = true,
   showCompare = true,
-  showReviews = true,
 }: ProductCardProps) => {
   const summaryId = useId();
-  const t = useTranslations('Product.ProductSheet');
 
   if (!product.entityId) {
     return null;
@@ -103,12 +99,11 @@ export const ProductCard = ({
           })}
         >
           {product.defaultImage ? (
-            <BcImage
+            <Image
               alt={product.defaultImage.altText ?? product.name ?? ''}
               className="object-contain"
               fill
               priority={imagePriority}
-              sizes="(max-width: 768px) 50vw, (max-width: 1536px) 25vw, 500px"
               src={product.defaultImage.url ?? ''}
             />
           ) : (
@@ -121,7 +116,7 @@ export const ProductCard = ({
         <ProductCardInfoProductName>
           {product.path ? (
             <Link
-              className="focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-primary/20 focus-visible:ring-0"
+              className="focus:outline focus:outline-4 focus:outline-offset-2 focus:outline-blue-primary/20 focus:ring-0"
               href={product.path}
             >
               <span aria-hidden="true" className="absolute inset-0 bottom-20" />
@@ -131,12 +126,12 @@ export const ProductCard = ({
             product.name
           )}
         </ProductCardInfoProductName>
-        {product.reviewSummary && showReviews && (
+        {product.reviewSummary && (
           <div className="flex items-center gap-3">
             <p
               aria-describedby={summaryId}
               className={cn(
-                'flex flex-nowrap text-primary',
+                'flex flex-nowrap text-blue-primary',
                 product.reviewSummary.numberOfReviews === 0 && 'text-gray-400',
               )}
             >
@@ -146,19 +141,17 @@ export const ProductCard = ({
             <div className="text-xs font-normal text-gray-500" id={summaryId}>
               {product.reviewSummary.averageRating !== 0 && (
                 <>
-                  {t.rich('productRating', {
-                    currentRating: product.reviewSummary.averageRating,
-                    rating: (chunks) => <span className="sr-only">{chunks}</span>,
-                    stars: (chunks) => <span className="sr-only">{chunks}</span>,
-                  })}
+                  <span className="sr-only">Rating:</span>
+                  {product.reviewSummary.averageRating}
+                  <span className="sr-only">out of 5 stars.</span>{' '}
                 </>
               )}
-              <span className="sr-only">{t('numberReviews')}</span>(
+              <span className="sr-only">Number of reviews:</span>(
               {product.reviewSummary.numberOfReviews})
             </div>
           </div>
         )}
-        <div className="flex flex-wrap items-end justify-between pt-1">
+        <div className="flex flex-wrap items-end justify-between pt-2">
           <ProductCardInfoPrice>
             <Pricing prices={product.prices} />
           </ProductCardInfoPrice>

@@ -1,52 +1,38 @@
-import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
+import { useMemo } from 'react';
 
-import { FragmentOf, graphql } from '~/client/graphql';
+import { AvailableWebPages, getWebPages } from '~/client/queries/get-web-pages';
+import { ExistingResultType } from '~/client/util';
 
-import { BaseFooterMenu } from '../footer-menus';
+import { BaseFooterMenu } from './base-footer-menu';
 
-export const WebPageFooterMenuFragment = graphql(`
-  fragment WebPageFooterMenuFragment on Content {
-    pages(filters: { isVisibleInNavigation: true }) {
-      edges {
-        node {
-          __typename
-          name
-          ... on RawHtmlPage {
-            path
-          }
-          ... on ContactPage {
-            path
-          }
-          ... on NormalPage {
-            path
-          }
-          ... on BlogIndexPage {
-            path
-          }
-          ... on ExternalLinkPage {
-            link
-          }
-        }
-      }
+const filterActivePages = (availableStorePages: AvailableWebPages) =>
+  availableStorePages.reduce<Array<{ name: string; path: string }>>((visiblePages, currentPage) => {
+    if (currentPage.isVisibleInNavigation) {
+      const { name, __typename } = currentPage;
+
+      visiblePages.push({
+        name,
+        path: __typename === 'ExternalLinkPage' ? currentPage.link : currentPage.path,
+      });
+
+      return visiblePages;
     }
-  }
-`);
+
+    return visiblePages;
+  }, []);
+
+type WebPages = ExistingResultType<typeof getWebPages>;
 
 interface Props {
-  data: FragmentOf<typeof WebPageFooterMenuFragment>;
+  webPages: WebPages;
 }
 
-export const WebPageFooterMenu = ({ data }: Props) => {
-  const pages = removeEdgesAndNodes(data.pages);
+export const WebPageFooterMenu = ({ webPages }: Props) => {
+  const items = useMemo(() => filterActivePages(webPages), [webPages]);
 
-  const items = pages.map((page) => ({
-    name: page.name,
-    path: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
-  }));
-
-  if (!items.length) {
-    return null;
+  if (items.length > 0) {
+    return <BaseFooterMenu items={items} title="About us" />;
   }
 
-  return <BaseFooterMenu items={items} title="Navigate" />;
+  return null;
 };

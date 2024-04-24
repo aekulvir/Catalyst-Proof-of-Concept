@@ -4,36 +4,36 @@
 const config = {
   content: ['./src/**/*.{ts,tsx}', './app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
-    extend: {
-      colors: {
-        transparent: 'transparent',
-        current: 'currentColor',
-        black: '#000000',
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      black: '#000000',
+      blue: {
         primary: '#053FB0',
         secondary: '#3071EF',
-        white: '#FFFFFF',
-        error: {
-          DEFAULT: '#AD0000',
-          secondary: '#C62828',
-        },
-        success: {
-          DEFAULT: '#146622',
-          secondary: '#388E3C',
-        },
-        gray: {
-          100: '#F1F3F5',
-          200: '#CFD8DC',
-          300: '#AFBAC5',
-          400: '#90A4AE',
-          500: '#546E7A',
-          600: '#091D45',
-        },
       },
+      gray: {
+        100: '#F1F3F5',
+        200: '#CFD8DC',
+        300: '#AFBAC5',
+        400: '#90A4AE',
+        500: '#546E7A',
+        600: '#091D45',
+      },
+      green: {
+        100: '#388E3C',
+        200: '#146622',
+        300: '#4FD055',
+      },
+      red: {
+        100: '#C62828',
+        200: '#AD0000',
+      },
+      white: '#ffffff',
+    },
+    extend: {
       fontFamily: {
         sans: ['var(--font-inter)'],
-      },
-      borderColor: {
-        DEFAULT: '#CFD8DC',
       },
       keyframes: {
         revealVertical: {

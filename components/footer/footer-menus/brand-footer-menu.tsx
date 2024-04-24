@@ -1,28 +1,15 @@
-import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
-
-import { FragmentOf, graphql } from '~/client/graphql';
+import { getBrands } from '~/client/queries/get-brands';
+import { ExistingResultType } from '~/client/util';
 
 import { BaseFooterMenu } from './base-footer-menu';
 
-export const BrandsFooterMenuFragment = graphql(`
-  fragment BrandsFooterMenuFragment on BrandConnection {
-    edges {
-      node {
-        entityId
-        name
-        path
-      }
-    }
-  }
-`);
+type Brands = ExistingResultType<typeof getBrands>;
 
 interface Props {
-  data: FragmentOf<typeof BrandsFooterMenuFragment>;
+  brands: Brands;
 }
 
-export const BrandFooterMenu = ({ data }: Props) => {
-  const brands = removeEdgesAndNodes(data);
-
+export const BrandFooterMenu = ({ brands }: Props) => {
   if (!brands.length) {
     return null;
   }

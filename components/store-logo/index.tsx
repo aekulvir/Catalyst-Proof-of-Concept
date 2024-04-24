@@ -1,40 +1,24 @@
-import { FragmentOf, graphql } from '~/client/graphql';
+import Image from 'next/image';
 
-import { BcImage } from '../bc-image';
+import { getStoreSettings } from '~/client/queries/get-store-settings';
+import { ExistingResultType } from '~/client/util';
 
-export const StoreLogoFragment = graphql(`
-  fragment StoreLogoFragment on Settings {
-    storeName
-    logoV2 {
-      __typename
-      ... on StoreTextLogo {
-        text
-      }
-      ... on StoreImageLogo {
-        image {
-          url: urlTemplate
-          altText
-        }
-      }
-    }
-  }
-`);
+type StoreSettings = ExistingResultType<typeof getStoreSettings>;
 
 interface Props {
-  data: FragmentOf<typeof StoreLogoFragment>;
+  settings: StoreSettings;
 }
 
-export const StoreLogo = ({ data }: Props) => {
-  const { logoV2: logo, storeName } = data;
+export const StoreLogo = ({ settings }: Props) => {
+  const { logoV2: logo, storeName } = settings;
 
   if (logo.__typename === 'StoreTextLogo') {
     return <span className="text-2xl font-black">{logo.text}</span>;
   }
 
   return (
-    <BcImage
+    <Image
       alt={logo.image.altText ? logo.image.altText : storeName}
-      className="max-h-16 object-contain"
       height={32}
       priority
       src={logo.image.url}

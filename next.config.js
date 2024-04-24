@@ -1,19 +1,15 @@
 // @ts-check
-const createNextIntlPlugin = require('next-intl/plugin');
-
-const withNextIntl = createNextIntlPlugin();
-
-const cspHeader = `
-  base-uri 'self';
-  form-action 'self';
-  frame-ancestors 'none';
-`;
+const withMakeswift = require('@makeswift/runtime/next/plugin')();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    optimizePackageImports: ['@icons-pack/react-simple-icons'],
+  images: {
+    remotePatterns: [
+      {
+        hostname: process.env.BIGCOMMERCE_CDN_HOSTNAME ?? '*.bigcommerce.com',
+      },
+    ],
   },
   transpilePackages: ['@bigcommerce/components'],
   typescript: {
@@ -21,23 +17,13 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: !!process.env.CI,
-    dirs: ['app', 'client', 'components', 'lib', 'middlewares'],
+    dirs: ['app', 'client', 'components', 'lib', 'middlewares', 'pages', 'providers'],
   },
-  // default URL generation in BigCommerce uses trailing slash
-  trailingSlash: process.env.TRAILING_SLASH !== 'false',
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: cspHeader.replace(/\n/g, ''),
-          },
-        ],
-      },
-    ];
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
+  experimental: {
+    optimizePackageImports: ['@icons-pack/react-simple-icons'],
   },
 };
 
-module.exports = withNextIntl(nextConfig);
+module.exports = withMakeswift(nextConfig);

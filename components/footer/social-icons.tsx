@@ -7,7 +7,9 @@ import {
   SiYoutube,
 } from '@icons-pack/react-simple-icons';
 
-import { FragmentOf, graphql } from '~/client/graphql';
+import { FooterNav, FooterNavGroupList, FooterNavLink } from '@bigcommerce/components/footer';
+import { getStoreSettings } from '~/client/queries/get-store-settings';
+import { ExistingResultType } from '~/client/util';
 import { Link } from '~/components/link';
 
 const socialIconNames = [
@@ -46,43 +48,36 @@ const SocialIcon = ({ name }: { name: string }) => {
   }
 };
 
-export const SocialIconsFragment = graphql(`
-  fragment SocialIconsFragment on Settings {
-    socialMediaLinks {
-      name
-      url
-    }
-  }
-`);
+type StoreSettings = ExistingResultType<typeof getStoreSettings>;
 
 interface Props {
-  data: FragmentOf<typeof SocialIconsFragment>;
+  storeSettings: StoreSettings;
 }
 
-export const SocialIcons = ({ data }: Props) => {
-  const socialMediaLinks = data.socialMediaLinks;
+export const SocialIcons = ({ storeSettings }: Props) => {
+  const socialMediaLinks = storeSettings.socialMediaLinks;
 
   if (socialMediaLinks.length === 0) {
     return null;
   }
 
   return (
-    <nav aria-label="Social media links" className="block">
-      <ul className="flex gap-6">
+    <FooterNav aria-label="Social media links" className="block">
+      <FooterNavGroupList className="flex-row gap-6">
         {socialMediaLinks.map((link) => {
           if (!socialIconNames.includes(link.name)) {
             return null;
           }
 
           return (
-            <li key={link.name}>
-              <Link className="inline-block" href={link.url}>
+            <FooterNavLink asChild key={link.name}>
+              <Link href={link.url}>
                 <SocialIcon name={link.name} />
               </Link>
-            </li>
+            </FooterNavLink>
           );
         })}
-      </ul>
-    </nav>
+      </FooterNavGroupList>
+    </FooterNav>
   );
 };

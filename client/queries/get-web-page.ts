@@ -1,53 +1,75 @@
 import { cache } from 'react';
 
 import { client } from '..';
-import { graphql } from '../graphql';
-import { revalidate } from '../revalidate-target';
+import { graphql } from '../generated';
 
-const WEB_PAGE_FRAGMENT = graphql(`
-  fragment WebPage on WebPage {
-    __typename
-    entityId
-    name
-    seo {
-      pageTitle
-      metaKeywords
-      metaDescription
-    }
-  }
-`);
-
-const GET_WEB_PAGE_QUERY = graphql(
-  `
-    query getWebPage($path: String!) {
-      site {
-        route(path: $path) {
-          node {
+export const GET_WEB_PAGE_QUERY = /* GraphQL */ `
+  query getWebPage($path: String!, $characterLimit: Int = 120) {
+    site {
+      route(path: $path) {
+        node {
+          ... on RawHtmlPage {
+            path
+            htmlBody
+            plainTextSummary(characterLimit: $characterLimit)
+            seo {
+              pageTitle
+              metaKeywords
+              metaDescription
+            }
             ...WebPage
-            ... on ContactPage {
-              contactFields
-              htmlBody
+          }
+          ... on ContactPage {
+            contactFields
+            path
+            htmlBody
+            plainTextSummary(characterLimit: $characterLimit)
+            renderedRegions {
+              regions {
+                name
+                html
+              }
             }
-            ... on NormalPage {
-              htmlBody
+            seo {
+              pageTitle
+              metaKeywords
+              metaDescription
             }
+            ...WebPage
+          }
+          ... on NormalPage {
+            htmlBody
+            plainTextSummary(characterLimit: $characterLimit)
+            renderedRegions {
+              regions {
+                name
+                html
+              }
+            }
+            seo {
+              pageTitle
+              metaKeywords
+              metaDescription
+            }
+            ...WebPage
           }
         }
       }
     }
-  `,
-  [WEB_PAGE_FRAGMENT],
-);
+  }
+`;
 
 export interface Options {
   path: string;
+  characterLimit?: number;
 }
 
-export const getWebPage = cache(async ({ path }: Options) => {
+export const getWebPage = cache(async ({ path, characterLimit = 120 }: Options) => {
+  const query = graphql(GET_WEB_PAGE_QUERY);
+
   const response = await client.fetch({
-    document: GET_WEB_PAGE_QUERY,
-    variables: { path },
-    fetchOptions: { next: { revalidate } },
+    document: query,
+    variables: { path, characterLimit },
   });
 
   const webpage = response.data.site.route.node;
@@ -59,6 +81,7 @@ export const getWebPage = cache(async ({ path }: Options) => {
   switch (webpage.__typename) {
     case 'ContactPage':
     case 'NormalPage':
+    case 'RawHtmlPage':
       return webpage;
 
     default:

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Label } from '@bigcommerce/components/label';
@@ -8,7 +9,6 @@ import { Select, SelectContent, SelectItem } from '@bigcommerce/components/selec
 import { Swatch, SwatchItem } from '@bigcommerce/components/swatch';
 import { getProduct } from '~/client/queries/get-product';
 import { ExistingResultType, Unpacked } from '~/client/util';
-import { BcImage } from '~/components/bc-image';
 
 import { useProductFieldController } from '../use-product-form';
 
@@ -24,14 +24,14 @@ export const MultipleChoiceField = ({ option }: { option: MultipleChoiceOption }
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const searchParamSelected = searchParams.get(String(option.entityId));
+  const searchParamSelected = searchParams?.get(String(option.entityId));
 
   const handleOnValueChange = ({ optionId, valueId }: { optionId: number; valueId: number }) => {
-    const optionSearchParams = new URLSearchParams(searchParams.toString());
+    const optionSearchParams = new URLSearchParams(searchParams?.toString());
 
     optionSearchParams.set(String(optionId), String(valueId));
 
-    router.replace(`${pathname}?${optionSearchParams.toString()}`, { scroll: false });
+    router.replace(`${pathname ?? ''}?${optionSearchParams.toString()}`, { scroll: false });
   };
 
   const selectedValue = option.values.find((value) => value.isSelected)?.entityId.toString();
@@ -141,11 +141,7 @@ export const MultipleChoiceField = ({ option }: { option: MultipleChoiceOption }
           >
             {option.values.map((value) => (
               <div className="mb-2 flex" key={value.entityId}>
-                <RadioItem
-                  id={`${value.entityId}`}
-                  value={`${value.entityId}`}
-                  variant={error ? 'error' : undefined}
-                />
+                <RadioItem id={`${value.entityId}`} value={`${value.entityId}`} />
                 <Label className="cursor-pointer ps-4 font-normal" htmlFor={`${value.entityId}`}>
                   {value.label}
                 </Label>
@@ -213,7 +209,7 @@ export const MultipleChoiceField = ({ option }: { option: MultipleChoiceOption }
                 return (
                   <div className="flex items-center p-4" key={value.entityId}>
                     {Boolean(value.defaultImage) && (
-                      <BcImage
+                      <Image
                         alt={value.defaultImage?.altText || ''}
                         className="me-6"
                         height={48}

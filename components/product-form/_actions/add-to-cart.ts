@@ -3,15 +3,13 @@
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 
-import { graphql } from '~/client/graphql';
+import { CartSelectedOptionsInput } from '~/client/generated/graphql';
 import { addCartLineItem } from '~/client/mutations/add-cart-line-item';
 import { createCart } from '~/client/mutations/create-cart';
 import { getCart } from '~/client/queries/get-cart';
 import { getProduct } from '~/client/queries/get-product';
 
 import { ProductFormData } from '../use-product-form';
-
-type CartSelectedOptionsInput = ReturnType<typeof graphql.scalar<'CartSelectedOptionsInput'>>;
 
 export async function handleAddToCart(data: ProductFormData) {
   const productEntityId = Number(data.product_id);
@@ -32,9 +30,6 @@ export async function handleAddToCart(data: ProductFormData) {
       let textFieldOptionInput;
       let multiLineTextFieldOptionInput;
       let dateFieldOptionInput;
-
-      // Skip empty strings since option is empty
-      if (optionValueEntityId === '') return accum;
 
       switch (option.__typename) {
         case 'MultipleChoiceOption':
@@ -110,6 +105,8 @@ export async function handleAddToCart(data: ProductFormData) {
           return { ...accum, multiLineTextFields: [multiLineTextFieldOptionInput] };
 
         case 'DateFieldOption':
+          if (!optionValueEntityId) return accum;
+
           dateFieldOptionInput = {
             optionEntityId: option.entityId,
             date: new Date(String(optionValueEntityId)).toISOString(),

@@ -1,13 +1,7 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Default",
   "compilerOptions": {
-    "paths": {
-      "~/*": [
-        "./*"
-      ],
-      "@bigcommerce/components/*": [
-        "./components/ui/*"
-      ]
-    },
     "target": "esnext",
     "lib": [
       "dom",
@@ -28,6 +22,14 @@
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "strict": true,
+    "paths": {
+      "~/*": [
+        "./*"
+      ],
+      "@bigcommerce/components/*": [
+        "./components/ui/*"
+      ]
+    },
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "allowJs": true,
     "noUncheckedIndexedAccess": true,
@@ -36,19 +38,10 @@
     "plugins": [
       {
         "name": "next"
-      },
-      {
-        "name": "@0no-co/graphqlsp",
-        "schema": "./schema.graphql",
-        "tadaOutputLocation": "./graphql-env.d.ts",
-        "trackFieldUsage": false,
-        "shouldCheckForColocatedFragments": false
       }
     ],
     "baseUrl": "."
   },
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Default",
   "include": [
     "next-env.d.ts",
     "**/*.cjs",

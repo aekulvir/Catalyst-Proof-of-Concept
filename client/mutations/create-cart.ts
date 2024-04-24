@@ -1,9 +1,10 @@
 import { getSessionCustomerId } from '~/auth';
 
 import { client } from '..';
-import { graphql, VariablesOf } from '../graphql';
+import { graphql } from '../generated';
+import { CreateCartInput } from '../generated/graphql';
 
-const CREATE_CART_MUTATION = graphql(`
+export const CREATE_CART_MUTATION = /* GraphQL */ `
   mutation CreateCart($createCartInput: CreateCartInput!) {
     cart {
       createCart(input: $createCartInput) {
@@ -13,16 +14,14 @@ const CREATE_CART_MUTATION = graphql(`
       }
     }
   }
-`);
+`;
 
-type Variables = VariablesOf<typeof CREATE_CART_MUTATION>;
-type LineItems = Variables['createCartInput']['lineItems'];
-
-export const createCart = async (cartItems: LineItems) => {
+export const createCart = async (cartItems: CreateCartInput['lineItems']) => {
+  const mutation = graphql(CREATE_CART_MUTATION);
   const customerId = await getSessionCustomerId();
 
   const response = await client.fetch({
-    document: CREATE_CART_MUTATION,
+    document: mutation,
     variables: {
       createCartInput: {
         lineItems: cartItems,

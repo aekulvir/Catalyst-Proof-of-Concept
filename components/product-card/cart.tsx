@@ -2,7 +2,6 @@
 
 import { AlertCircle, Check } from 'lucide-react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 import { toast } from 'react-hot-toast';
 
 import { Button } from '@bigcommerce/components/button';
@@ -17,14 +16,11 @@ import { Product } from '.';
 export const Cart = ({ product }: { product: Partial<Product> }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  const t = useTranslations('Product.ProductSheet');
+  const newSearchParams = new URLSearchParams(searchParams?.toString());
 
   if (!product.entityId) {
     return null;
   }
-
-  const newSearchParams = new URLSearchParams(searchParams);
 
   newSearchParams.set('showQuickAdd', String(product.entityId));
 
@@ -32,10 +28,10 @@ export const Cart = ({ product }: { product: Partial<Product> }) => {
     <Button asChild>
       <Link
         className="mt-2 hover:text-white"
-        href={`${pathname}?${newSearchParams.toString()}`}
+        href={`${pathname ?? ''}?${newSearchParams.toString()}`}
         scroll={false}
       >
-        {t('quickAdd')}
+        Quick add
       </Link>
     </Button>
   ) : (
@@ -45,7 +41,7 @@ export const Cart = ({ product }: { product: Partial<Product> }) => {
         const quantity = Number(formData.get('quantity'));
 
         if (result?.error) {
-          toast.error(result.error, { icon: <AlertCircle className="text-error-secondary" /> });
+          toast.error(result.error, { icon: <AlertCircle className="text-red-100" /> });
 
           return;
         }
@@ -54,23 +50,14 @@ export const Cart = ({ product }: { product: Partial<Product> }) => {
           () => (
             <div className="flex items-center gap-3">
               <span>
-                {t.rich('addedProductQuantity', {
-                  cartItems: quantity,
-                  cartLink: (chunks) => (
-                    <Link
-                      className="font-semibold text-primary"
-                      href="/cart"
-                      prefetch="viewport"
-                      prefetchKind="full"
-                    >
-                      {chunks}
-                    </Link>
-                  ),
-                })}
+                {quantity} {quantity === 1 ? 'Item' : 'Items'} added to{' '}
+                <Link className="font-semibold text-blue-primary" href="/cart" prefetch={false}>
+                  your cart
+                </Link>
               </span>
             </div>
           ),
-          { icon: <Check className="text-success-secondary" /> },
+          { icon: <Check className="text-green-100" /> },
         );
       }}
     >

@@ -3,9 +3,9 @@ import { useId } from 'react';
 import {
   Carousel,
   CarouselContent,
-  CarouselItem,
   CarouselNextIndicator,
   CarouselPreviousIndicator,
+  CarouselSlide,
 } from '@bigcommerce/components/carousel';
 
 import { Product, ProductCard } from '../product-card';
@@ -17,13 +17,11 @@ export const ProductCardCarousel = ({
   products,
   showCart = true,
   showCompare = true,
-  showReviews = true,
 }: {
   title: string;
   products: Array<Partial<Product>>;
   showCart?: boolean;
   showCompare?: boolean;
-  showReviews?: boolean;
 }) => {
   const id = useId();
 
@@ -46,7 +44,7 @@ export const ProductCardCarousel = ({
   }, []);
 
   return (
-    <Carousel aria-labelledby="title" className="mb-14" opts={{ loop: true }}>
+    <Carousel aria-labelledby="title" className="mb-14">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-black lg:text-4xl" id="title">
           {title}
@@ -57,24 +55,21 @@ export const ProductCardCarousel = ({
         </span>
       </div>
       <CarouselContent>
-        {groupedProducts.map((group, index) => (
-          <CarouselItem
+        {products.map((product, index) => (
+          <CarouselSlide
             aria-label={`${index + 1} of ${groupedProducts.length}`}
             id={`${id}-slide-${index + 1}`}
             index={index}
             key={index}
           >
-            {group.map((product) => (
-              <ProductCard
-                imageSize="tall"
-                key={product.entityId}
-                product={product}
-                showCart={showCart}
-                showCompare={showCompare}
-                showReviews={showReviews}
-              />
-            ))}
-          </CarouselItem>
+            <ProductCard
+              imageSize="tall"
+              key={product.entityId}
+              product={product}
+              showCart={showCart}
+              showCompare={showCompare}
+            />
+          </CarouselSlide>
         ))}
       </CarouselContent>
       <Pagination groupedProducts={groupedProducts} id={id} />

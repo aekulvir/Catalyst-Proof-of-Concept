@@ -4,10 +4,9 @@ import { cache } from 'react';
 import { getSessionCustomerId } from '~/auth';
 
 import { client } from '..';
-import { graphql } from '../graphql';
-import { revalidate } from '../revalidate-target';
+import { graphql } from '../generated';
 
-const GET_CATEGORY_QUERY = graphql(`
+export const GET_CATEGORY_QUERY = /* GraphQL */ `
   query getCategory(
     $after: String
     $before: String
@@ -19,12 +18,11 @@ const GET_CATEGORY_QUERY = graphql(`
     site {
       category(entityId: $categoryId) {
         name
+        description
+        path
         products(after: $after, before: $before, first: $first, last: $last) {
           pageInfo {
-            hasNextPage
-            hasPreviousPage
-            startCursor
-            endCursor
+            ...PageDetails
           }
           edges {
             node {
@@ -40,7 +38,7 @@ const GET_CATEGORY_QUERY = graphql(`
                 }
               }
               defaultImage {
-                url: urlTemplate
+                url(width: 300)
                 altText
               }
             }
@@ -58,7 +56,7 @@ const GET_CATEGORY_QUERY = graphql(`
       }
     }
   }
-`);
+`;
 
 export interface CategoryOptions {
   after?: string;
@@ -70,15 +68,18 @@ export interface CategoryOptions {
 
 export const getCategory = cache(
   async ({ categoryId, limit = 9, before, after, breadcrumbDepth = 10 }: CategoryOptions) => {
+    const query = graphql(GET_CATEGORY_QUERY);
     const customerId = await getSessionCustomerId();
 
     const paginationArgs = before ? { last: limit, before } : { first: limit, after };
 
     const response = await client.fetch({
-      document: GET_CATEGORY_QUERY,
+      document: query,
       variables: { categoryId, breadcrumbDepth, ...paginationArgs },
       customerId,
-      fetchOptions: customerId ? { cache: 'no-store' } : { next: { revalidate } },
+      fetchOptions: {
+        cache: customerId ? 'no-store' : 'force-cache',
+      },
     });
 
     const category = response.data.site.category;

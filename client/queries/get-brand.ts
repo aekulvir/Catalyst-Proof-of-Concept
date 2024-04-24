@@ -1,14 +1,13 @@
 import { cache } from 'react';
 
 import { client } from '..';
-import { graphql } from '../graphql';
-import { revalidate } from '../revalidate-target';
+import { graphql } from '../generated';
 
 export interface GetBrandOptions {
   brandId: number;
 }
 
-const GET_BRAND_QUERY = graphql(`
+const GET_BRAND_QUERY = /* GraphQL */ `
   query getBrand($entityId: Int!) {
     site {
       brand(entityId: $entityId) {
@@ -18,13 +17,14 @@ const GET_BRAND_QUERY = graphql(`
       }
     }
   }
-`);
+`;
 
 export const getBrand = cache(async ({ brandId }: GetBrandOptions) => {
+  const query = graphql(GET_BRAND_QUERY);
+
   const response = await client.fetch({
-    document: GET_BRAND_QUERY,
+    document: query,
     variables: { entityId: brandId },
-    fetchOptions: { next: { revalidate } },
   });
 
   const brand = response.data.site.brand;

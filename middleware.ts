@@ -1,8 +1,8 @@
 import { composeMiddlewares } from './middlewares/compose-middlewares';
 import { withAuth } from './middlewares/with-auth';
-import { withRoutes } from './middlewares/with-routes';
+import { withCustomUrls } from './middlewares/with-custom-urls';
 
-export const middleware = composeMiddlewares(withAuth, withRoutes);
+export const middleware = composeMiddlewares(withAuth, withCustomUrls);
 
 export const config = {
   matcher: [
@@ -14,6 +14,6 @@ export const config = {
      * - _vercel (vercel internals, eg: web vitals)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|admin|_next/static|_next/image|_vercel|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|_vercel|favicon.ico).*)',
   ],
 };

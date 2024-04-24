@@ -1,23 +1,15 @@
 import { Fragment } from 'react';
 
-import { FragmentOf, graphql } from '~/client/graphql';
+import { getStoreSettings } from '~/client/queries/get-store-settings';
+import { ExistingResultType } from '~/client/util';
 
-export const ContactInformationFragment = graphql(`
-  fragment ContactInformationFragment on Settings {
-    contact {
-      address
-      phone
-    }
-  }
-`);
+type Contact = ExistingResultType<typeof getStoreSettings>['contact'];
 
 interface Props {
-  data: FragmentOf<typeof ContactInformationFragment>;
+  contact: Contact;
 }
 
-export const ContactInformation = ({ data }: Props) => {
-  const { contact } = data;
-
+export const ContactInformation = ({ contact }: Props) => {
   if (!contact) {
     return null;
   }
@@ -33,10 +25,7 @@ export const ContactInformation = ({ data }: Props) => {
         ))}
       </address>
       {contact.phone ? (
-        <a
-          className="hover:text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
-          href={`tel:${contact.phone}`}
-        >
+        <a href={`tel:${contact.phone}`}>
           <p>{contact.phone}</p>
         </a>
       ) : null}

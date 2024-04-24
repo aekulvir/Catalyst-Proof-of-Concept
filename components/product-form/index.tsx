@@ -1,7 +1,6 @@
 'use client';
 
 import { AlertCircle, Check, Heart } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import { FormProvider } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 
@@ -24,46 +23,35 @@ import { ProductFormData, useProductForm } from './use-product-form';
 
 type Product = ExistingResultType<typeof getProduct>;
 
+export const productFormSubmit = async (data: ProductFormData) => {
+  const result = await handleAddToCart(data);
+  const quantity = Number(data.quantity);
+
+  if (result?.error) {
+    toast.error(result.error || 'Something went wrong. Please try again.', {
+      icon: <AlertCircle className="text-red-100" />,
+    });
+
+    return;
+  }
+
+  toast.success(
+    () => (
+      <div className="flex items-center gap-3">
+        <span>
+          {quantity} {quantity === 1 ? 'Item' : 'Items'} added to{' '}
+          <Link className="font-semibold text-blue-primary hover:text-blue-secondary" href="/cart">
+            your cart
+          </Link>
+        </span>
+      </div>
+    ),
+    { icon: <Check className="text-green-100" /> },
+  );
+};
+
 export const ProductForm = ({ product }: { product: Product }) => {
-  const t = useTranslations('Product.Form');
-
   const { handleSubmit, register, ...methods } = useProductForm();
-
-  const productFormSubmit = async (data: ProductFormData) => {
-    const result = await handleAddToCart(data);
-    const quantity = Number(data.quantity);
-
-    if (result?.error) {
-      toast.error(result.error || t('errorMessage'), {
-        icon: <AlertCircle className="text-error-secondary" />,
-      });
-
-      return;
-    }
-
-    toast.success(
-      () => (
-        <div className="flex items-center gap-3">
-          <span>
-            {t.rich('addedProductQuantity', {
-              cartItems: quantity,
-              cartLink: (chunks) => (
-                <Link
-                  className="font-semibold text-primary hover:text-secondary"
-                  href="/cart"
-                  prefetch="viewport"
-                  prefetchKind="full"
-                >
-                  {chunks}
-                </Link>
-              ),
-            })}
-          </span>
-        </div>
-      ),
-      { icon: <Check className="text-success-secondary" /> },
-    );
-  };
 
   return (
     <FormProvider handleSubmit={handleSubmit} register={register} {...methods}>
@@ -107,7 +95,7 @@ export const ProductForm = ({ product }: { product: Product }) => {
           <div className="w-full">
             <Button disabled type="submit" variant="secondary">
               <Heart aria-hidden="true" className="mx-2" />
-              <span>{t('saveToWishlist')}</span>
+              <span>Save to wishlist</span>
             </Button>
           </div>
         </div>

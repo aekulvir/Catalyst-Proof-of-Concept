@@ -1,9 +1,9 @@
 import { getSessionCustomerId } from '~/auth';
 
 import { client } from '..';
-import { graphql } from '../graphql';
+import { graphql } from '../generated';
 
-const DELETE_CART_LINE_ITEM = graphql(`
+export const DELETE_CART_LINE_ITEM = /* GraphQL */ `
   mutation DeleteCartLineItem($input: DeleteCartLineItemInput!) {
     cart {
       deleteCartLineItem(input: $input) {
@@ -13,13 +13,14 @@ const DELETE_CART_LINE_ITEM = graphql(`
       }
     }
   }
-`);
+`;
 
 export const deleteCartLineItem = async (cartEntityId: string, lineItemEntityId: string) => {
+  const mutation = graphql(DELETE_CART_LINE_ITEM);
   const customerId = await getSessionCustomerId();
 
   const response = await client.fetch({
-    document: DELETE_CART_LINE_ITEM,
+    document: mutation,
     variables: {
       input: {
         cartEntityId,

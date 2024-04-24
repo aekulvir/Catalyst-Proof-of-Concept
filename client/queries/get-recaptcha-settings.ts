@@ -1,8 +1,7 @@
 import { client } from '..';
-import { graphql } from '../graphql';
-import { revalidate } from '../revalidate-target';
+import { graphql } from '../generated';
 
-const GET_RECAPTCHA_SETTINGS_QUERY = graphql(`
+const GET_RECAPTCHA_SETTINGS_QUERY = /* GraphQL */ `
   query getReCaptchaSettings {
     site {
       settings {
@@ -13,13 +12,11 @@ const GET_RECAPTCHA_SETTINGS_QUERY = graphql(`
       }
     }
   }
-`);
+`;
 
 export const getReCaptchaSettings = async () => {
-  const response = await client.fetch({
-    document: GET_RECAPTCHA_SETTINGS_QUERY,
-    fetchOptions: { next: { revalidate } },
-  });
+  const query = graphql(GET_RECAPTCHA_SETTINGS_QUERY);
+  const response = await client.fetch({ document: query });
 
   return response.data.site.settings?.reCaptcha;
 };

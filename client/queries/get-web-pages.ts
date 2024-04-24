@@ -1,22 +1,19 @@
 import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
-import { cache } from 'react';
 
 import { client } from '..';
-import { graphql } from '../graphql';
-import { revalidate } from '../revalidate-target';
+import { graphql } from '../generated';
 import { ExistingResultType } from '../util';
 
 export type AvailableWebPages = ExistingResultType<typeof getWebPages>;
 
-const GET_WEB_PAGES_QUERY = graphql(`
+export const GET_WEB_PAGES_QUERY = /* GraphQL */ `
   query getWebPages {
     site {
       content {
         pages(filters: { isVisibleInNavigation: true }) {
           edges {
             node {
-              __typename
-              name
+              ...WebPage
               ... on RawHtmlPage {
                 path
               }
@@ -38,12 +35,13 @@ const GET_WEB_PAGES_QUERY = graphql(`
       }
     }
   }
-`);
+`;
 
-export const getWebPages = cache(async () => {
+export const getWebPages = async () => {
+  const query = graphql(GET_WEB_PAGES_QUERY);
+
   const response = await client.fetch({
-    document: GET_WEB_PAGES_QUERY,
-    fetchOptions: { next: { revalidate } },
+    document: query,
   });
 
   const { pages } = response.data.site.content;
@@ -53,4 +51,4 @@ export const getWebPages = cache(async () => {
   }
 
   return removeEdgesAndNodes(pages);
-});
+};

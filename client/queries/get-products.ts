@@ -4,46 +4,48 @@ import { cache } from 'react';
 import { getSessionCustomerId } from '~/auth';
 
 import { client } from '..';
-import { PRODUCT_DETAILS_FRAGMENT } from '../fragments/product-details';
-import { graphql } from '../graphql';
-import { revalidate } from '../revalidate-target';
+import { graphql } from '../generated';
 
 export interface GetProductsArguments {
   productIds: number[];
   first: number;
+  imageWidth?: number;
+  imageHeight?: number;
 }
 
-const GET_PRODUCTS_QUERY = graphql(
-  `
-    query getProducts($entityIds: [Int!], $first: Int) {
-      site {
-        products(entityIds: $entityIds, first: $first) {
-          edges {
-            node {
-              ...ProductDetails
-            }
+const GET_PRODUCTS_QUERY = /* GraphQL */ `
+  query getProducts($entityIds: [Int!], $first: Int, $imageHeight: Int!, $imageWidth: Int!) {
+    site {
+      products(entityIds: $entityIds, first: $first) {
+        edges {
+          node {
+            ...ProductDetails
           }
         }
       }
     }
-  `,
-  [PRODUCT_DETAILS_FRAGMENT],
+  }
+`;
+
+export const getProducts = cache(
+  async ({ productIds, first, imageWidth = 300, imageHeight = 300 }: GetProductsArguments) => {
+    const query = graphql(GET_PRODUCTS_QUERY);
+    const customerId = await getSessionCustomerId();
+
+    const response = await client.fetch({
+      document: query,
+      variables: { entityIds: productIds, first, imageWidth, imageHeight },
+      customerId,
+      fetchOptions: {
+        cache: customerId ? 'no-store' : 'force-cache',
+      },
+    });
+
+    const products = removeEdgesAndNodes(response.data.site.products);
+
+    return products.map((product) => ({
+      ...product,
+      productOptions: removeEdgesAndNodes(product.productOptions),
+    }));
+  },
 );
-
-export const getProducts = cache(async ({ productIds, first }: GetProductsArguments) => {
-  const customerId = await getSessionCustomerId();
-
-  const response = await client.fetch({
-    document: GET_PRODUCTS_QUERY,
-    variables: { entityIds: productIds, first },
-    customerId,
-    fetchOptions: customerId ? { cache: 'no-store' } : { next: { revalidate } },
-  });
-
-  const products = removeEdgesAndNodes(response.data.site.products);
-
-  return products.map((product) => ({
-    ...product,
-    productOptions: removeEdgesAndNodes(product.productOptions),
-  }));
-});

@@ -2,8 +2,7 @@ import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { cache } from 'react';
 
 import { client } from '..';
-import { graphql } from '../graphql';
-import { revalidate } from '../revalidate-target';
+import { graphql } from '../generated';
 
 interface BlogPostsFiltersInput {
   tagId?: string;
@@ -15,7 +14,7 @@ interface Pagination {
   after?: string;
 }
 
-const GET_BLOG_POSTS_QUERY = graphql(`
+const GET_BLOG_POSTS_QUERY = /* GraphQL */ `
   query getBlogPosts(
     $first: Int
     $after: String
@@ -31,23 +30,27 @@ const GET_BLOG_POSTS_QUERY = graphql(`
           name
           posts(first: $first, after: $after, last: $last, before: $before, filters: $filters) {
             pageInfo {
-              hasNextPage
-              hasPreviousPage
-              startCursor
-              endCursor
+              ...PageDetails
             }
             edges {
               node {
                 author
                 entityId
+                htmlBody
                 name
+                path
                 plainTextSummary
                 publishedDate {
                   utc
                 }
                 thumbnailImage {
-                  url: urlTemplate
+                  url(width: 300)
                   altText
+                }
+                seo {
+                  metaKeywords
+                  metaDescription
+                  pageTitle
                 }
               }
             }
@@ -56,17 +59,18 @@ const GET_BLOG_POSTS_QUERY = graphql(`
       }
     }
   }
-`);
+`;
 
 export const getBlogPosts = cache(
   async ({ tagId, limit = 9, before, after }: BlogPostsFiltersInput & Pagination) => {
     const filterArgs = tagId ? { filters: { tags: [tagId] } } : {};
     const paginationArgs = before ? { last: limit, before } : { first: limit, after };
 
+    const query = graphql(GET_BLOG_POSTS_QUERY);
+
     const response = await client.fetch({
-      document: GET_BLOG_POSTS_QUERY,
+      document: query,
       variables: { ...filterArgs, ...paginationArgs },
-      fetchOptions: { next: { revalidate } },
     });
 
     const { blog } = response.data.site.content;

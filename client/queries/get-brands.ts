@@ -1,16 +1,14 @@
 import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
-import { cache } from 'react';
 
 import { client } from '..';
-import { graphql } from '../graphql';
-import { revalidate } from '../revalidate-target';
+import { graphql } from '../generated';
 
 interface GetBrandsOptions {
   first?: number;
   brandIds?: number[];
 }
 
-const GET_BRANDS_QUERY = graphql(`
+const GET_BRANDS_QUERY = /* GraphQL */ `
   query getBrands($first: Int, $entityIds: [Int!]) {
     site {
       brands(first: $first, entityIds: $entityIds) {
@@ -24,16 +22,17 @@ const GET_BRANDS_QUERY = graphql(`
       }
     }
   }
-`);
+`;
 
-export const getBrands = cache(async ({ first = 5, brandIds }: GetBrandsOptions = {}) => {
+export const getBrands = async ({ first = 5, brandIds }: GetBrandsOptions = {}) => {
+  const query = graphql(GET_BRANDS_QUERY);
+
   const response = await client.fetch({
-    document: GET_BRANDS_QUERY,
+    document: query,
     variables: { first, entityIds: brandIds },
-    fetchOptions: { next: { revalidate } },
   });
 
   const { brands } = response.data.site;
 
   return removeEdgesAndNodes(brands);
-});
+};

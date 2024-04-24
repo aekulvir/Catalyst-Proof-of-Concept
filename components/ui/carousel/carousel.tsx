@@ -8,143 +8,29 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
+  useRef,
   useState,
 } from 'react';
 
 import { cn } from '~/lib/utils';
 
-type CarouselApi = UseEmblaCarouselType[1];
-type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
-type CarouselOptions = UseCarouselParameters[0];
-type CarouselPlugin = UseCarouselParameters[1];
+const CarouselContext = createContext<UseEmblaCarouselType>([() => null, undefined]);
 
-interface CarouselProps {
-  opts?: CarouselOptions;
-  plugins?: CarouselPlugin;
-  setApi?: (api: CarouselApi) => void;
-}
-
-type CarouselContextProps = {
-  carouselRef: ReturnType<typeof useEmblaCarousel>[0];
-  api: ReturnType<typeof useEmblaCarousel>[1];
-  scrollPrev: () => void;
-  scrollNext: () => void;
-  canScrollPrev: boolean;
-  canScrollNext: boolean;
-  selectedSnapIndex: number;
-  slidesInView: number[];
-} & CarouselProps;
-
-const CarouselContext = createContext<CarouselContextProps | null>(null);
-
-function useCarousel() {
-  const context = useContext(CarouselContext);
-
-  if (!context) {
-    throw new Error('useCarousel must be used within a <Carousel />');
-  }
-
-  return context;
-}
-
-const Carousel = forwardRef<ElementRef<'div'>, ComponentPropsWithRef<'div'> & CarouselProps>(
-  ({ opts, setApi, plugins, className, children, ...props }, ref) => {
-    const [carouselRef, api] = useEmblaCarousel(
-      {
-        ...opts,
-        axis: 'x',
-      },
-      plugins,
-    );
-
-    const [canScrollPrev, setCanScrollPrev] = useState(false);
-    const [canScrollNext, setCanScrollNext] = useState(false);
-
-    const [selectedSnapIndex, setSelectedSnapIndex] = useState(0);
-
-    const [slidesInView, setSlidesInView] = useState<number[]>([0]);
-
-    const onSelect = useCallback((emblaApi: CarouselApi) => {
-      if (!emblaApi) {
-        return;
-      }
-
-      setSelectedSnapIndex(emblaApi.selectedScrollSnap());
-
-      setCanScrollPrev(emblaApi.canScrollPrev());
-      setCanScrollNext(emblaApi.canScrollNext());
-    }, []);
-
-    const scrollPrev = useCallback(() => {
-      api?.scrollPrev();
-    }, [api]);
-
-    const scrollNext = useCallback(() => {
-      api?.scrollNext();
-    }, [api]);
-
-    const handleKeyDown = useCallback(
-      (event: React.KeyboardEvent<HTMLDivElement>) => {
-        if (event.key === 'ArrowLeft') {
-          event.preventDefault();
-          scrollPrev();
-        } else if (event.key === 'ArrowRight') {
-          event.preventDefault();
-          scrollNext();
-        }
-      },
-      [scrollPrev, scrollNext],
-    );
-
-    useEffect(() => {
-      if (!api || !setApi) {
-        return;
-      }
-
-      setApi(api);
-    }, [api, setApi]);
-
-    useEffect(() => {
-      if (!api) {
-        return;
-      }
-
-      onSelect(api);
-      api.on('reInit', onSelect);
-      api.on('select', onSelect);
-      api.on('slidesInView', () => {
-        setSlidesInView(api.slidesInView());
-      });
-
-      return () => {
-        api.off('select', onSelect);
-      };
-    }, [api, onSelect]);
+const Carousel = forwardRef<ElementRef<'section'>, ComponentPropsWithRef<'section'>>(
+  ({ children, className, ...props }, ref) => {
+    const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, slidesToScroll: 'auto' });
 
     return (
-      <CarouselContext.Provider
-        value={{
-          carouselRef,
-          api,
-          opts,
-          scrollPrev,
-          scrollNext,
-          canScrollPrev,
-          canScrollNext,
-          selectedSnapIndex,
-          slidesInView,
-        }}
-      >
-        <div
+      <CarouselContext.Provider value={[emblaRef, emblaApi]}>
+        <section
           aria-roledescription="carousel"
-          className={cn('relative', className)}
-          onKeyDownCapture={handleKeyDown}
+          className={cn('relative overflow-x-hidden pb-16', className)}
           ref={ref}
-          role="region"
           {...props}
         >
           {children}
-        </div>
+        </section>
       </CarouselContext.Provider>
     );
   },
@@ -152,15 +38,28 @@ const Carousel = forwardRef<ElementRef<'div'>, ComponentPropsWithRef<'div'> & Ca
 
 Carousel.displayName = 'Carousel';
 
-const CarouselContent = forwardRef<ElementRef<'div'>, ComponentPropsWithRef<'div'>>(
+type ForwardedRef = ElementRef<'div'> | null;
+
+const CarouselContent = forwardRef<ForwardedRef, ComponentPropsWithRef<'ul'>>(
   ({ children, className, ...props }, ref) => {
-    const { carouselRef } = useCarousel();
+    const mutableRef = useRef<ForwardedRef>(null);
+    const [emblaRef] = useContext(CarouselContext);
+
+    useImperativeHandle<ForwardedRef, ForwardedRef>(ref, () => mutableRef.current, []);
+
+    const refCallback = useCallback(
+      (current: ForwardedRef) => {
+        emblaRef(current);
+        mutableRef.current = current;
+      },
+      [emblaRef],
+    );
 
     return (
-      <div className="-mx-2 overflow-hidden px-2" ref={carouselRef}>
-        <div className={cn('-mx-6 mb-16 mt-8 flex lg:mt-10', className)} ref={ref} {...props}>
+      <div ref={refCallback}>
+        <ul aria-live="polite" className={cn('-ml-8 mt-5 flex lg:mt-6', className)} {...props}>
           {children}
-        </div>
+        </ul>
       </div>
     );
   },
@@ -168,51 +67,74 @@ const CarouselContent = forwardRef<ElementRef<'div'>, ComponentPropsWithRef<'div
 
 CarouselContent.displayName = 'CarouselContent';
 
-const CarouselItem = forwardRef<
-  ElementRef<'div'>,
-  ComponentPropsWithRef<'div'> & { index: number }
->(({ children, className, index, ...props }, ref) => {
-  const { slidesInView } = useCarousel();
+interface CarouselSlideProps extends ComponentPropsWithRef<'li'> {
+  index: number;
+}
 
-  return (
-    <div
-      aria-roledescription="slide"
-      className={cn(
-        'grid min-w-0 shrink-0 grow-0 basis-full grid-cols-2 gap-6 px-6 md:grid-cols-4 lg:gap-8',
-        !slidesInView.includes(index) && 'invisible',
-        className,
-      )}
-      ref={ref}
-      role="group"
-      {...props}
-    >
-      {children}
-    </div>
-  );
-});
+const CarouselSlide = forwardRef<ElementRef<'li'>, CarouselSlideProps>(
+  ({ children, className, index, ...props }, ref) => {
+    const [, emblaApi] = useContext(CarouselContext);
+    const [slidesInView, setSlidesInView] = useState<number[]>([0]);
 
-CarouselItem.displayName = 'CarouselItem';
+    useEffect(() => {
+      if (!emblaApi) return;
+
+      emblaApi.on('slidesInView', () => {
+        setSlidesInView(emblaApi.slidesInView());
+      });
+    }, [emblaApi]);
+
+    return (
+      <li
+        aria-roledescription="slide"
+        className={cn(
+          'min-w-0 shrink-0 grow-0 basis-full pl-8 sm:basis-1/2 md:basis-1/3 lg:basis-1/4',
+          className,
+        )}
+        ref={ref}
+        role="tabpanel"
+        {...props}
+      >
+        {children}
+      </li>
+    );
+  },
+);
+
+CarouselSlide.displayName = 'CarouselSlide';
 
 const CarouselPreviousIndicator = forwardRef<ElementRef<'button'>, ComponentPropsWithRef<'button'>>(
   ({ children, className, onClick, ...props }, ref) => {
-    const { api, scrollPrev, canScrollPrev } = useCarousel();
-    const isHidden = api?.scrollSnapList().length === 1;
+    const [, emblaApi] = useContext(CarouselContext);
+    const [isHidden, setIsHidden] = useState(false);
+
+    const scrollPrev = useCallback(() => {
+      if (emblaApi) emblaApi.scrollPrev();
+    }, [emblaApi]);
+
+    useEffect(() => {
+      if (emblaApi) setIsHidden(emblaApi.scrollSnapList().length <= 1);
+    }, [emblaApi]);
 
     return (
       <button
         aria-label="Previous products"
         className={cn(
-          'inline-flex h-12 w-12 items-center justify-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 disabled:text-gray-400',
+          'inline-flex h-12 w-12 items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-primary/20',
           isHidden && 'hidden',
           className,
         )}
-        disabled={!canScrollPrev}
-        onClick={scrollPrev}
+        onClick={(e) => {
+          scrollPrev();
+
+          if (onClick) {
+            onClick(e);
+          }
+        }}
         ref={ref}
         {...props}
       >
         {children || <ArrowLeft />}
-        <span className="sr-only">Previous slide</span>
       </button>
     );
   },
@@ -222,24 +144,36 @@ CarouselPreviousIndicator.displayName = 'CarouselPreviousIndicator';
 
 const CarouselNextIndicator = forwardRef<ElementRef<'button'>, ComponentPropsWithRef<'button'>>(
   ({ children, className, onClick, ...props }, ref) => {
-    const { api, scrollNext, canScrollNext } = useCarousel();
-    const isHidden = api?.scrollSnapList().length === 1;
+    const [, emblaApi] = useContext(CarouselContext);
+    const [isHidden, setIsHidden] = useState(false);
+
+    const scrollNext = useCallback(() => {
+      if (emblaApi) emblaApi.scrollNext();
+    }, [emblaApi]);
+
+    useEffect(() => {
+      if (emblaApi) setIsHidden(emblaApi.scrollSnapList().length <= 1);
+    }, [emblaApi]);
 
     return (
       <button
         aria-label="Next products"
         className={cn(
-          'inline-flex h-12 w-12 items-center justify-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 disabled:text-gray-400',
+          'inline-flex h-12 w-12 items-center justify-center focus:outline-none focus:ring-4 focus:ring-blue-primary/20',
           isHidden && 'hidden',
           className,
         )}
-        disabled={!canScrollNext}
-        onClick={scrollNext}
+        onClick={(e) => {
+          scrollNext();
+
+          if (onClick) {
+            onClick(e);
+          }
+        }}
         ref={ref}
         {...props}
       >
         {children || <ArrowRight />}
-        <span className="sr-only">Next slide</span>
       </button>
     );
   },
@@ -247,69 +181,98 @@ const CarouselNextIndicator = forwardRef<ElementRef<'button'>, ComponentPropsWit
 
 CarouselNextIndicator.displayName = 'CarouselNextIndicator';
 
-const CarouselPagination = forwardRef<ElementRef<'div'>, ComponentPropsWithRef<'div'>>(
-  ({ children, className, onClick, ...props }, ref) => {
-    const { api } = useCarousel();
-    const isHidden = api?.scrollSnapList().length === 1;
+interface CarouselPaginationProps extends Omit<ComponentPropsWithRef<'div'>, 'children'> {
+  children?:
+    | (({
+        selectedIndex,
+        scrollTo,
+      }: {
+        selectedIndex: number;
+        scrollTo: (index: number) => void | undefined;
+      }) => React.ReactNode)
+    | React.ReactNode;
+}
 
-    return (
-      <div
-        aria-label="Slides"
-        className={cn(
-          'no-wrap absolute bottom-1 flex w-full items-center justify-center gap-2',
-          isHidden && 'hidden',
-        )}
-        ref={ref}
-        role="tablist"
-        {...props}
-      >
-        {children}
-      </div>
+const CarouselPagination = forwardRef<ElementRef<'div'>, CarouselPaginationProps>(
+  ({ children, className, onClick, ...props }, ref) => {
+    const [, emblaApi] = useContext(CarouselContext);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
+
+    const onInit = useCallback(() => {
+      if (emblaApi) setScrollSnaps(emblaApi.scrollSnapList());
+    }, [emblaApi]);
+
+    const scrollTo = useCallback(
+      (index: number) => emblaApi && emblaApi.scrollTo(index),
+      [emblaApi],
     );
+
+    const onSelect = useCallback(() => {
+      if (emblaApi) setSelectedIndex(emblaApi.selectedScrollSnap());
+    }, [emblaApi]);
+
+    useEffect(() => {
+      if (!emblaApi) return;
+
+      onInit();
+      emblaApi.on('reInit', onInit);
+      emblaApi.on('select', onSelect);
+    }, [emblaApi, onInit, onSelect]);
+
+    if (scrollSnaps.length <= 1) {
+      return null;
+    }
+
+    if (typeof children === 'function') {
+      return (
+        <div
+          aria-label="Slides"
+          className={cn('no-wrap absolute bottom-0 flex w-full items-center justify-center gap-2')}
+          ref={ref}
+          role="tablist"
+          {...props}
+        >
+          {children({ selectedIndex, scrollTo })}
+        </div>
+      );
+    }
+
+    return null;
   },
 );
 
 CarouselPagination.displayName = 'CarouselPagination';
 
-const CarouselPaginationTab = forwardRef<
-  ElementRef<'button'>,
-  ComponentPropsWithRef<'button'> & { index: number }
->(({ children, className, index, ...props }, ref) => {
-  const { api, selectedSnapIndex } = useCarousel();
+interface CarouselPaginationTabProps extends ComponentPropsWithRef<'button'> {
+  isSelected: boolean;
+}
 
-  const isSelected = selectedSnapIndex === index;
-
-  const onClick = useCallback(() => {
-    if (!api) {
-      return;
-    }
-
-    api.scrollTo(index);
-  }, [api, index]);
-
-  return (
-    <button
-      aria-selected={isSelected}
-      className={cn(
-        "h-7 w-7 p-0.5 after:block after:h-0.5 after:w-full after:bg-gray-400 after:content-[''] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20",
-        isSelected && 'after:bg-black',
-        className,
-      )}
-      onClick={onClick}
-      ref={ref}
-      role="tab"
-      {...props}
-    />
-  );
-});
+const CarouselPaginationTab = forwardRef<ElementRef<'button'>, CarouselPaginationTabProps>(
+  ({ children, className, isSelected, ...props }, ref) => {
+    return (
+      <button
+        aria-selected={isSelected}
+        className={cn(
+          "h-7 w-7 p-0.5 after:block after:h-0.5 after:w-full after:bg-gray-400 after:content-[''] focus:outline-none focus:ring-4 focus:ring-blue-primary/20",
+          isSelected && 'after:bg-black',
+          className,
+        )}
+        ref={ref}
+        role="tab"
+        {...props}
+      />
+    );
+  },
+);
 
 CarouselPaginationTab.displayName = 'CarouselPaginationTab';
 
 export {
-  type CarouselApi,
   Carousel,
   CarouselContent,
-  CarouselItem,
+  CarouselSlide,
   CarouselPreviousIndicator,
   CarouselNextIndicator,
   CarouselPagination,

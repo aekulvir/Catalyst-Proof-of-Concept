@@ -1,8 +1,7 @@
 import { Loader2 as Spinner } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import { ChangeEvent, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import ReCaptcha from 'react-google-recaptcha';
+import { ReCAPTCHA } from 'react-google-recaptcha';
 
 import { Button } from '@bigcommerce/components/button';
 import {
@@ -34,18 +33,17 @@ interface ContactUsProps {
 }
 
 const fieldNameMapping = {
-  fullname: 'fullNameLabel',
-  companyname: 'companyNameLabel',
-  phone: 'phoneLabel',
-  orderno: 'orderNoLabel',
-  rma: 'rmaLabel',
+  fullname: 'Full name',
+  companyname: 'Company name',
+  phone: 'Phone',
+  orderno: 'Order number',
+  rma: 'RMA number',
 } as const;
 
 type Field = keyof typeof fieldNameMapping;
 
 const Submit = () => {
   const { pending } = useFormStatus();
-  const t = useTranslations('AboutUs');
 
   return (
     <FormSubmit asChild>
@@ -60,10 +58,10 @@ const Submit = () => {
               <span className="absolute z-10 flex h-full w-full items-center justify-center bg-gray-400">
                 <Spinner aria-hidden="true" className="animate-spin" />
               </span>
-              <span className="sr-only">{t('onSubmitText')}</span>
+              <span className="sr-only">Submitting...</span>
             </>
           )}
-          <span aria-hidden={pending}>{t('submitFormText')}</span>
+          <span aria-hidden={pending}>Submit form</span>
         </>
       </Button>
     </FormSubmit>
@@ -75,13 +73,11 @@ export const ContactUs = ({ fields, pageEntityId, reCaptchaSettings }: ContactUs
   const [formStatus, setFormStatus] = useState<FormStatus | null>(null);
   const [isTextFieldValid, setTextFieldValidation] = useState(true);
   const [isInputValid, setInputValidation] = useState(true);
-  const reCaptchaRef = useRef<ReCaptcha>(null);
+  const reCaptchaRef = useRef<ReCAPTCHA>(null);
   const [reCaptchaToken, setReCaptchaToken] = useState('');
   const [isReCaptchaValid, setReCaptchaValid] = useState(true);
 
-  const t = useTranslations('AboutUs');
-
-  const onReCaptchaChange = (token: string | null) => {
+  const onReCatpchaChange = (token: string | null) => {
     if (!token) {
       return setReCaptchaValid(false);
     }
@@ -103,7 +99,7 @@ export const ContactUs = ({ fields, pageEntityId, reCaptchaSettings }: ContactUs
       form.current?.reset();
       setFormStatus({
         status: 'success',
-        message: t('sucessSubmitMessage'),
+        message: "Thanks for reaching out. We'll get back to you soon.",
       });
     }
 
@@ -143,17 +139,17 @@ export const ContactUs = ({ fields, pageEntityId, reCaptchaSettings }: ContactUs
               const label = fieldNameMapping[field];
 
               return (
-                <Field className="relative space-y-2 pb-7" key={label} name={field}>
-                  <FieldLabel htmlFor={field}>{t(label)}</FieldLabel>
+                <Field className="relative space-y-2 pb-7" key={label} name={label}>
+                  <FieldLabel htmlFor={label}>{label}</FieldLabel>
                   <FieldControl asChild>
-                    <Input id={field} />
+                    <Input id={label} />
                   </FieldControl>
                 </Field>
               );
             })}
           <Field className="relative space-y-2 pb-7" key="email" name="email">
             <FieldLabel htmlFor="email" isRequired>
-              {t('emailLabel')}
+              Email
             </FieldLabel>
             <FieldControl asChild>
               <Input
@@ -166,16 +162,16 @@ export const ContactUs = ({ fields, pageEntityId, reCaptchaSettings }: ContactUs
               />
             </FieldControl>
             <FieldMessage
-              className="absolute inset-x-0 bottom-0 inline-flex w-full text-xs font-normal text-error"
+              className="absolute inset-x-0 bottom-0 inline-flex w-full text-xs font-normal text-red-200"
               match="valueMissing"
             >
-              {t('emailValidationMessage')}
+              Enter a valid email such as name@domain.com
             </FieldMessage>
             <FieldMessage
-              className="absolute inset-x-0 bottom-0 inline-flex w-full text-xs font-normal text-error"
+              className="absolute inset-x-0 bottom-0 inline-flex w-full text-xs font-normal text-red-200"
               match="typeMismatch"
             >
-              {t('emailValidationMessage')}
+              Enter a valid email such as name@domain.com
             </FieldMessage>
           </Field>
           <Field
@@ -184,7 +180,7 @@ export const ContactUs = ({ fields, pageEntityId, reCaptchaSettings }: ContactUs
             name="comments"
           >
             <FieldLabel htmlFor="comments" isRequired>
-              {t('commentsLabel')}
+              Comments/questions
             </FieldLabel>
             <FieldControl asChild>
               <TextArea
@@ -196,23 +192,23 @@ export const ContactUs = ({ fields, pageEntityId, reCaptchaSettings }: ContactUs
               />
             </FieldControl>
             <FieldMessage
-              className="absolute inset-x-0 bottom-0 inline-flex w-full text-xs font-normal text-error"
+              className="absolute inset-x-0 bottom-0 inline-flex w-full text-xs font-normal text-red-200"
               match="valueMissing"
             >
-              {t('commentsValidationMessage')}
+              Please provide a valid Comments
             </FieldMessage>
           </Field>
         </>
         {reCaptchaSettings?.isEnabledOnStorefront && (
           <Field className="relative col-span-full max-w-full space-y-2 pb-7" name="ReCAPTCHA">
-            <ReCaptcha
-              onChange={onReCaptchaChange}
+            <ReCAPTCHA
+              onChange={onReCatpchaChange}
               ref={reCaptchaRef}
               sitekey={reCaptchaSettings.siteKey}
             />
             {!isReCaptchaValid && (
-              <span className="absolute inset-x-0 bottom-0 inline-flex w-full text-xs font-normal text-error">
-                {t('recaptchaText')}
+              <span className="absolute inset-x-0 bottom-0 inline-flex w-full text-xs font-normal text-red-200">
+                Pass ReCAPTCHA check
               </span>
             )}
           </Field>
