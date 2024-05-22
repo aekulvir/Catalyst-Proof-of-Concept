@@ -192,8 +192,8 @@ export const withCustomUrls: MiddlewareFactory = (next) => {
         const { pathname } = new URL(request.url);
 
         if (pathname === '/' && postfix) {
-          const url = createRewriteUrl(postfix, request);
-
+          //const url = createRewriteUrl(postfix, request);
+          const url = createRewriteUrl('homepage', request);
           return NextResponse.rewrite(url);
         }
 
