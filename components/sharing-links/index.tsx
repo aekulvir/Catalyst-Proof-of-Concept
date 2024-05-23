@@ -24,15 +24,15 @@ export const SharingLinks = ({
     <div className="mb-10 flex items-center [&>*:not(:last-child)]:me-2.5">
       <h3 className="text-xl font-bold lg:text-2xl">Share</h3>
       <a
-        className="hover:text-blue-primary focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
+        className="hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
         href={`https://facebook.com/sharer/sharer.php?u=${encodedUrl}`}
         rel="noopener noreferrer"
         target="_blank"
       >
-        <SiFacebook size={24} title="Facebook" />
+        <SiFacebook size={24} title="Facebook"/>
       </a>
       <a
-        className="hover:text-blue-primary focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
+        className="hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
         href={`mailto:?subject=${encodedTitle}&body=${encodedUrl}`}
         rel="noopener noreferrer"
         target="_self"
@@ -55,7 +55,7 @@ export const SharingLinks = ({
         </Printer>
       </button>
       <a
-        className="hover:text-blue-primary focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
+        className="hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
         href={`https://twitter.com/intent/tweet/?text=${encodedTitle}&url=${encodedUrl}`}
         rel="noopener noreferrer"
         target="_blank"
@@ -63,7 +63,7 @@ export const SharingLinks = ({
         <SiX size={24} title="X" />
       </a>
       <a
-        className="hover:text-blue-primary focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
+        className="hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
         href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}&summary=${encodedTitle}&source=${encodedUrl}`}
         rel="noopener noreferrer"
         target="_blank"
@@ -71,7 +71,7 @@ export const SharingLinks = ({
         <SiLinkedin size={24} title="LinkedIn" />
       </a>
       <a
-        className="hover:text-blue-primary focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
+        className="hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-primary/20"
         href={`https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${blogPostImageUrl}&description=${encodedTitle}`}
         rel="noopener noreferrer"
         target="_blank"

@@ -39,53 +39,65 @@ export const BasePagesHeader = ({
 }: Props) => {
   return (
     <header>
-      <NavigationMenu>
-        <div className="flex items-center gap-10">
+      <NavigationMenu className='flex-col lg:gap-2'>
+        <div className="flex items-start gap-6 justify-between w-full">
           <NavigationMenuLink asChild className="px-0">
             <Link href="/">
               <StoreLogo settings={storeSettings} />
             </Link>
           </NavigationMenuLink>
 
-          {nav}
-        </div>
+          <div className="flex py-3">
+            <NavigationMenuList className="items-start">
+              <NavigationMenuItem className='hidden md:block'>
+                {quickSearch}
+              </NavigationMenuItem>
 
-        <div className="flex">
-          <NavigationMenuList>
-            <NavigationMenuItem>{quickSearch}</NavigationMenuItem>
+              <NavigationMenuItem className="hidden lg:flex">
+                {isLoggedIn ? (
+                  <Button
+                    className="p-3 text-black hover:bg-transparent"
+                    onClick={() => signOut()}
+                    type="button"
+                    variant="subtle"
+                  >
+                    <LogOut />
+                  </Button>
+                ) : (
+                  <NavigationMenuLink asChild>
+                    <Link aria-label="Login" href="/login">
+                      <User />
+                    </Link>
+                  </NavigationMenuLink>
+                )}
+              </NavigationMenuItem>
 
-            <NavigationMenuItem className="hidden lg:flex">
-              {isLoggedIn ? (
-                <Button
-                  className="p-3 text-black hover:bg-transparent"
-                  onClick={() => signOut()}
-                  type="button"
-                  variant="subtle"
-                >
-                  <LogOut />
-                </Button>
-              ) : (
+              <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                  <Link aria-label="Login" href="/login">
-                    <User />
+                  <Link className="relative" href="/cart">
+                    {cart}
                   </Link>
                 </NavigationMenuLink>
-              )}
-            </NavigationMenuItem>
+              </NavigationMenuItem>
+            </NavigationMenuList>
 
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <Link className="relative" href="/cart">
-                  {cart}
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
+            <NavigationMenuToggle className="ms-2 lg:hidden" />
+          </div>
 
-          <NavigationMenuToggle className="ms-2 lg:hidden" />
+          <NavigationMenuCollapsed>{collapsedNav}</NavigationMenuCollapsed>
         </div>
 
-        <NavigationMenuCollapsed>{collapsedNav}</NavigationMenuCollapsed>
+        <div className='block md:hidden w-full'>
+          <NavigationMenuList className="items-start">
+            <NavigationMenuItem className='flex-1'>
+              {quickSearch}
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </div>
+        
+        <div className="flex items-center justify-between w-full pb-2 mb-4 border-b">
+          {nav}
+        </div>
       </NavigationMenu>
     </header>
   );

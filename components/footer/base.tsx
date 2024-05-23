@@ -29,8 +29,8 @@ interface Props {
 export const BaseFooter = ({ brands, categoryTree, storeSettings, webPages }: Props) => {
   return (
     <ReactantFooter>
-      <FooterSection>
-        <FooterNav>
+      <FooterSection className='sm:flex-col md:flex-row'>
+        <FooterNav className='sm:grid-flow-row md:grid-flow-col'>
           <CategoryFooterMenu categoryTree={categoryTree} />
           <BrandFooterMenu brands={brands} />
           <WebPageFooterMenu webPages={webPages} />
@@ -42,7 +42,7 @@ export const BaseFooter = ({ brands, categoryTree, storeSettings, webPages }: Pr
             title="Help"
           />
         </FooterNav>
-        <div className="flex shrink-0 grow flex-col gap-4 md:order-first">
+        <div className="flex shrink-0 grow flex-col gap-4">
           <ContactInformation contact={storeSettings.contact} />
           <SocialIcons storeSettings={storeSettings} />
         </div>

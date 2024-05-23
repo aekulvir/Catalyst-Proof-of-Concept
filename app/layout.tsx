@@ -43,7 +43,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <head>
         <DraftModeScript />
       </head>
-      <body className="flex h-screen flex-col">
+      <body className="flex h-screen flex-col" suppressHydrationWarning={true}>
         <Notifications />
         <Providers>{children}</Providers>
         <Analytics />

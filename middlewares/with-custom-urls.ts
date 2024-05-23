@@ -160,7 +160,7 @@ export const withCustomUrls: MiddlewareFactory = (next) => {
     if (!request.nextUrl.search && !customerId && !cartId && request.method === 'GET') {
       postfix = '/static';
     }
-
+    
     switch (node?.__typename) {
       case 'Brand': {
         const url = createRewriteUrl(`/brand/${node.entityId}${postfix}`, request);
@@ -190,9 +190,7 @@ export const withCustomUrls: MiddlewareFactory = (next) => {
 
       default: {
         const { pathname } = new URL(request.url);
-        console.log('pathname', pathname);
-        console.log('postfix', postfix);
-        if (pathname === '/' && postfix) {
+        if (pathname === '/') {
           //const url = createRewriteUrl(postfix, request);
           const url = createRewriteUrl('/homepage', request);
           return NextResponse.rewrite(url);
