@@ -6,8 +6,8 @@ interface Props extends ComponentPropsWithoutRef<'p'> {
 
 export const Copyright = ({ storeName, ...rest }: Props) => {
   return (
-    <p className="text-gray-500 sm:order-first" {...rest}>
-      © {new Date().getFullYear()} {storeName} – Powered by BigCommerce
+    <p className="text-white sm:order-first" {...rest}>
+      © {new Date().getFullYear()} {storeName}
     </p>
   );
 };
