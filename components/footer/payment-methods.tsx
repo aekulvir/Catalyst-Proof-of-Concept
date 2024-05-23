@@ -9,7 +9,7 @@ import { VisaIcon } from '../payment-icons/visa';
 
 export const PaymentMethods: React.FC<ComponentPropsWithoutRef<'div'>> = (props) => {
   return (
-    <div className="flex flex-row gap-6" {...props}>
+    <div className="flex flex-row gap-6 text-white " {...props}>
       <AmazonIcon />
       <AmericanExpressIcon />
       <ApplePayIcon />

@@ -19,10 +19,10 @@ export const StoreLogo = ({ settings }: Props) => {
   return (
     <Image
       alt={logo.image.altText ? logo.image.altText : storeName}
-      height={32}
+      height={53}
       priority
       src={logo.image.url}
-      width={155}
+      width={250}
     />
   );
 };

@@ -30,6 +30,9 @@ const config = {
         200: '#AD0000',
       },
       white: '#ffffff',
+      'ae-blue': {
+        100: '#003057'
+      }
     },
     extend: {
       fontFamily: {

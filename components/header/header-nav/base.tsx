@@ -80,7 +80,12 @@ export const BaseHeaderNav = ({
               </>
             ) : (
               <NavigationMenuLink asChild>
-                <Link href={category.path}>{category.name}</Link>
+                <Link 
+                  href={category.path} 
+                  className="text-ae-blue-100 cursor-pointer hover:text-ae-blue-100 hover:underline"
+                >
+                    {category.name}
+                </Link>
               </NavigationMenuLink>
             )}
           </NavigationMenuItem>

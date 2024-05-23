@@ -190,10 +190,11 @@ export const withCustomUrls: MiddlewareFactory = (next) => {
 
       default: {
         const { pathname } = new URL(request.url);
-
+        console.log('pathname', pathname);
+        console.log('postfix', postfix);
         if (pathname === '/' && postfix) {
           //const url = createRewriteUrl(postfix, request);
-          const url = createRewriteUrl('homepage', request);
+          const url = createRewriteUrl('/homepage', request);
           return NextResponse.rewrite(url);
         }
 

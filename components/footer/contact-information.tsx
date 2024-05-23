@@ -16,7 +16,7 @@ export const ContactInformation = ({ contact }: Props) => {
 
   return (
     <>
-      <address className="not-italic">
+      <address className="not-italic text-white">
         {contact.address.split('\n').map((line) => (
           <Fragment key={line}>
             {line}
@@ -25,7 +25,7 @@ export const ContactInformation = ({ contact }: Props) => {
         ))}
       </address>
       {contact.phone ? (
-        <a href={`tel:${contact.phone}`}>
+        <a href={`tel:${contact.phone}`} className='text-white hover:text-white hover:underline'>
           <p>{contact.phone}</p>
         </a>
       ) : null}
