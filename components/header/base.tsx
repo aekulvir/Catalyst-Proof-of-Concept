@@ -38,9 +38,9 @@ export const BasePagesHeader = ({
   isLoggedIn,
 }: Props) => {
   return (
-    <header>
+    <header className="fixed w-full z-10">
       <NavigationMenu className='flex-col lg:gap-2'>
-        <div className="flex items-start gap-6 justify-between w-full">
+        <div className="flex items-center gap-6 justify-between w-full">
           <NavigationMenuLink asChild className="px-0">
             <Link href="/">
               <StoreLogo settings={storeSettings} />
@@ -48,8 +48,8 @@ export const BasePagesHeader = ({
           </NavigationMenuLink>
 
           <div className="flex py-3">
-            <NavigationMenuList className="items-start">
-              <NavigationMenuItem className='hidden md:block'>
+            <NavigationMenuList className="items-center">
+              <NavigationMenuItem className='hidden lg:block'>
                 {quickSearch}
               </NavigationMenuItem>
 
@@ -87,7 +87,7 @@ export const BasePagesHeader = ({
           <NavigationMenuCollapsed>{collapsedNav}</NavigationMenuCollapsed>
         </div>
 
-        <div className='block md:hidden w-full'>
+        <div className='block lg:hidden w-full my-4'>
           <NavigationMenuList className="items-start">
             <NavigationMenuItem className='flex-1'>
               {quickSearch}
@@ -95,7 +95,7 @@ export const BasePagesHeader = ({
           </NavigationMenuList>
         </div>
         
-        <div className="flex items-center justify-between w-full pb-2 mb-4 border-b">
+        <div className="hidden lg:flex items-center justify-between w-full pb-2 mb-4 border-b">
           {nav}
         </div>
       </NavigationMenu>
