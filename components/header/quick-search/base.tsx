@@ -5,16 +5,9 @@ import { PropsWithChildren, useRef, useState } from 'react';
 import { Button } from '@bigcommerce/components/button';
 import { Field, FieldControl, Form } from '@bigcommerce/components/form';
 import { Input, InputIcon } from '@bigcommerce/components/input';
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetOverlay,
-  SheetTrigger,
-} from '@bigcommerce/components/sheet';
+
 import { getQuickSearchResults } from '~/client/queries/get-quick-search-results';
 import { ExistingResultType } from '~/client/util';
-import { cn } from '~/lib/utils';
 
 import { Pricing } from '../../pricing';
 
@@ -92,99 +85,101 @@ export const BaseQuickSearch = ({
         </Form>
       </div>
       {searchResults && searchResults.products.length > 0 && (
-        <div className="mt-8 grid overflow-auto px-1 lg:grid-cols-3 lg:gap-6">
-          <section>
-            <h3 className="mb-6 border-b border-gray-200 pb-3 text-xl font-bold lg:text-2xl">
-              Categories
-            </h3>
-            <ul id="categories" role="listbox">
-              {Object.entries(
-                searchResults.products.reduce<Record<string, string>>((categories, product) => {
-                  product.categories.edges?.forEach((category) => {
-                    if (category) {
-                      categories[category.node.name] = category.node.path;
-                    }
-                  });
+        <div className="mt-8 overflow-auto px-1 bg-white w-full md:fixed z-10 right-0 shadow-md">
+          <div className="grid lg:grid-cols-3 lg:gap-6 2xl:container 2xl:mx-auto 2xl:py-5 2xl:px-10">
+            <section>
+              <h3 className="mb-6 border-b border-gray-200 pb-3 text-xl font-bold lg:text-2xl">
+                Categories
+              </h3>
+              <ul id="categories" role="listbox">
+                {Object.entries(
+                  searchResults.products.reduce<Record<string, string>>((categories, product) => {
+                    product.categories.edges?.forEach((category) => {
+                      if (category) {
+                        categories[category.node.name] = category.node.path;
+                      }
+                    });
 
-                  return categories;
-                }, {}),
-              ).map(([name, path]) => {
-                return (
-                  <li className="mb-3 last:mb-6" key={name}>
-                    <a
-                      className="focus:ring-primary-blue/20 align-items mb-6 flex gap-x-6 focus:outline-none focus:ring-4"
-                      href={path}
-                    >
-                      {name}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-          <section>
-            <h3 className="mb-6 border-b border-gray-200 pb-3 text-xl font-bold lg:text-2xl">
-              Products
-            </h3>
-            <ul id="products" role="listbox">
-              {searchResults.products.map((product) => {
-                return (
-                  <li key={product.entityId}>
-                    <a
-                      className="focus:ring-primary-blue/20 align-items mb-6 flex gap-x-6 focus:outline-none focus:ring-4"
-                      href={product.path}
-                    >
-                      {product.defaultImage ? (
-                        <Image
-                          alt={product.defaultImage.altText}
-                          className="self-start object-contain"
-                          height={80}
-                          src={product.defaultImage.url}
-                          width={80}
-                        />
-                      ) : (
-                        <span className="flex h-20 w-20 flex-shrink-0 items-center justify-center bg-gray-200 text-lg font-bold text-gray-500">
-                          Photo
+                    return categories;
+                  }, {}),
+                ).map(([name, path]) => {
+                  return (
+                    <li className="mb-3 last:mb-6" key={name}>
+                      <a
+                        className="focus:ring-primary-blue/20 align-items mb-6 flex gap-x-6 focus:outline-none focus:ring-4"
+                        href={path}
+                      >
+                        {name}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+            <section>
+              <h3 className="mb-6 border-b border-gray-200 pb-3 text-xl font-bold lg:text-2xl">
+                Products
+              </h3>
+              <ul id="products" role="listbox">
+                {searchResults.products.map((product) => {
+                  return (
+                    <li key={product.entityId}>
+                      <a
+                        className="focus:ring-primary-blue/20 align-items mb-6 flex gap-x-6 focus:outline-none focus:ring-4"
+                        href={product.path}
+                      >
+                        {product.defaultImage ? (
+                          <Image
+                            alt={product.defaultImage.altText}
+                            className="self-start object-contain"
+                            height={80}
+                            src={product.defaultImage.url}
+                            width={80}
+                          />
+                        ) : (
+                          <span className="flex h-20 w-20 flex-shrink-0 items-center justify-center bg-gray-200 text-lg font-bold text-gray-500">
+                            Photo
+                          </span>
+                        )}
+
+                        <span className="flex flex-col">
+                          <p className="text-lg font-bold lg:text-2xl">{product.name}</p>
+                          <Pricing prices={product.prices} />
                         </span>
-                      )}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+            <section>
+              <h3 className="mb-6 border-b border-gray-200 pb-3 text-xl font-bold lg:text-2xl">
+                Brands
+              </h3>
+              <ul id="brands" role="listbox">
+                {Object.entries(
+                  searchResults.products.reduce<Record<string, string>>((brands, product) => {
+                    if (product.brand) {
+                      brands[product.brand.name] = product.brand.path;
+                    }
 
-                      <span className="flex flex-col">
-                        <p className="text-lg font-bold lg:text-2xl">{product.name}</p>
-                        <Pricing prices={product.prices} />
-                      </span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-          <section>
-            <h3 className="mb-6 border-b border-gray-200 pb-3 text-xl font-bold lg:text-2xl">
-              Brands
-            </h3>
-            <ul id="brands" role="listbox">
-              {Object.entries(
-                searchResults.products.reduce<Record<string, string>>((brands, product) => {
-                  if (product.brand) {
-                    brands[product.brand.name] = product.brand.path;
-                  }
-
-                  return brands;
-                }, {}),
-              ).map(([name, path]) => {
-                return (
-                  <li className="mb-3 last:mb-6" key={name}>
-                    <a
-                      className="focus:ring-primary-blue/20 align-items mb-6 flex gap-x-6 focus:outline-none focus:ring-4"
-                      href={path}
-                    >
-                      {name}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
+                    return brands;
+                  }, {}),
+                ).map(([name, path]) => {
+                  return (
+                    <li className="mb-3 last:mb-6" key={name}>
+                      <a
+                        className="focus:ring-primary-blue/20 align-items mb-6 flex gap-x-6 focus:outline-none focus:ring-4"
+                        href={path}
+                      >
+                        {name}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          </div>
         </div>
       )}
       {searchResults && searchResults.products.length === 0 && (
