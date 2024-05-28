@@ -183,7 +183,7 @@ export const BaseQuickSearch = ({
         </div>
       )}
       {searchResults && searchResults.products.length === 0 && (
-        <p className="pt-6">
+        <p className="pt-6 md:fixed">
           No products matched with <b>"{query}"</b>
         </p>
       )}
