@@ -56,7 +56,7 @@ export const BaseHeaderNav = ({
                 </NavigationMenuTrigger>
                 <NavigationMenuContent
                   className={cn(
-                    !inCollapsedNav && 'mx-auto flex w-[700px] flex-row gap-20',
+                    !inCollapsedNav && 'mx-auto flex w-[700px] flex-row gap-20 justify-start',
                     inCollapsedNav && 'ps-3',
                   )}
                 >
