@@ -61,7 +61,7 @@ export const BaseHeaderNav = ({
                   )}
                 >
                   {category.children.map((childCategory1) => (
-                    <ul className={cn(inCollapsedNav && 'pb-4')} key={childCategory1.entityId}>
+                    <ul className={cn(inCollapsedNav && 'pb-4 justify-start')} key={childCategory1.entityId}>
                       <NavigationMenuItem>
                         <NavigationMenuLink href={childCategory1.path}>
                           {childCategory1.name}
