@@ -86,7 +86,7 @@ export const BaseQuickSearch = ({
       </div>
       {searchResults && searchResults.products.length > 0 && (
         <div className="mt-8 overflow-auto px-1 bg-white w-full md:fixed z-10 right-0 shadow-md">
-          <div className="grid lg:grid-cols-3 lg:gap-6 2xl:container 2xl:mx-auto 2xl:py-5 2xl:px-10">
+          <div className="grid lg:grid-cols-3 lg:gap-6 2xl:container 2xl:mx-auto 2xl:py-5 px-6 sm:px-10 lg:px-12 2xl:px-0">
             <section>
               <h3 className="mb-6 border-b border-gray-200 pb-3 text-xl font-bold lg:text-2xl">
                 Categories
