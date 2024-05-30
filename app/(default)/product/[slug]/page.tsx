@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
 import { getProduct } from '~/client/queries/get-product';
-import { ProductForm } from '~/components/product-form';
+import Faqs from './_components/faqs';
+import FaqsLoading from './_components/faqs/loading';
 
+import { ProductForm } from '~/components/product-form';
 import { BreadCrumbs } from './_components/breadcrumbs';
 import { Gallery } from './_components/gallery';
 import { ProductSchema } from './_components/product-schema';
@@ -155,6 +157,15 @@ const ProductDescriptionAndReviews = ({ product }: { product: NonNullable<Produc
         </>
       )}
 
+
+      <h2 className="text-2xl font-bold my-4">Frequently Asked Questions</h2>
+      
+      <div className="md:w-2/3">
+        <Suspense fallback={<FaqsLoading />}>
+          <Faqs productId={product.entityId} />
+        </Suspense>
+      </div>
+
       <Suspense fallback="Loading...">
         <Reviews productId={product.entityId} />
       </Suspense>
@@ -232,7 +243,7 @@ export default async function Product({ params, searchParams }: ProductPageProps
       isDefault: true,
     });
   }
-
+    
   return (
     <>
       <BreadCrumbs productId={productId} />
