@@ -38,7 +38,7 @@ export const BasePagesHeader = ({
   isLoggedIn,
 }: Props) => {
   return (
-    <header className="fixed w-full z-10">
+    <header className="fixed w-full z-10 border-b">
       <NavigationMenu className='flex-col lg:gap-2'>
         <div className="flex items-center gap-6 justify-between w-full">
           <NavigationMenuLink asChild className="px-0">
@@ -84,18 +84,19 @@ export const BasePagesHeader = ({
             <NavigationMenuToggle className="ms-2 lg:hidden" />
           </div>
 
-          <NavigationMenuCollapsed>{collapsedNav}</NavigationMenuCollapsed>
-        </div>
-
-        <div className='block lg:hidden w-full my-4'>
-          <NavigationMenuList className="items-start">
-            <NavigationMenuItem className='flex-1'>
-              {quickSearch}
-            </NavigationMenuItem>
-          </NavigationMenuList>
+          <NavigationMenuCollapsed>
+            <div className='block lg:hidden w-full my-4'>
+              <NavigationMenuList className="items-start">
+                <NavigationMenuItem className='flex-1'>
+                  {quickSearch}
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </div>
+            {collapsedNav}
+          </NavigationMenuCollapsed>
         </div>
         
-        <div className="hidden lg:flex items-center justify-between w-full pb-2 mb-4 border-b">
+        <div className="hidden lg:flex items-center justify-between w-full pb-2">
           {nav}
         </div>
       </NavigationMenu>

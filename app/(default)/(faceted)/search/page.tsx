@@ -76,7 +76,7 @@ export default async function Search({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-8">
+      <div className="flex flex-col gap-8">
         <FacetedSearch
           className="mb-8 hidden lg:block"
           facets={search.facets.items}
@@ -84,12 +84,12 @@ export default async function Search({ searchParams }: Props) {
           pageType="search"
         />
 
-        <section aria-labelledby="product-heading" className="col-span-4 lg:col-span-3">
+        <section aria-labelledby="product-heading" className="col-span-4 lg:col-span-3 border-t pt-16">
           <h2 className="sr-only" id="product-heading">
             Products
           </h2>
 
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-8">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4 sm:gap-8">
             {products.map((product, index) => (
               <ProductCard
                 imagePriority={index <= 3}
