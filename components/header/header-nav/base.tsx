@@ -9,12 +9,12 @@ import {
   NavigationMenuTrigger,
 } from '@bigcommerce/components/navigation-menu';
 import { getCategoryTree } from '~/client/queries/get-category-tree';
-import { getHeaderWebPages } from '~/client/queries/ae/get-header-web-pages';
+import { getWebPagesWithChildren } from '~/client/queries/ae/get-web-pages-with-children';
 import { Link } from '~/components/link';
 import { cn } from '~/lib/utils';
 
 type CategoryTree = Awaited<ReturnType<typeof getCategoryTree>>;
-type WebPages = Awaited<ReturnType<typeof getHeaderWebPages>>;
+type WebPages = Awaited<ReturnType<typeof getWebPagesWithChildren>>;
 
 export const BaseHeaderNav = ({
   className,

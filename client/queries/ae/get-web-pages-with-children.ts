@@ -3,7 +3,7 @@ import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { client } from '~/client';
 import { graphql } from '~/client/generated';
 
-export const GET_HEADER_WEB_PAGES_QUERY = /* GraphQL */ `
+export const GET_WEB_PAGES_WITH_CHILDREN_QUERY = /* GraphQL */ `
   query getHeaderWebPages {
     site {
       content {
@@ -34,8 +34,8 @@ export const GET_HEADER_WEB_PAGES_QUERY = /* GraphQL */ `
   }
 `;
 
-export const getHeaderWebPages = async () => {
-  const query = graphql(GET_HEADER_WEB_PAGES_QUERY);
+export const getWebPagesWithChildren = async () => {
+  const query = graphql(GET_WEB_PAGES_WITH_CHILDREN_QUERY);
 
   const response = await client.fetch({
     document: query,

@@ -1,5 +1,5 @@
 import { getCategoryTree } from '~/client/queries/get-category-tree';
-import { getHeaderWebPages } from '~/client/queries/ae/get-header-web-pages';
+import { getWebPagesWithChildren } from '~/client/queries/ae/get-web-pages-with-children';
 
 import { BaseHeaderNav } from './base';
 
@@ -10,7 +10,7 @@ interface Props {
 
 export const HeaderNav = async ({ className, inCollapsedNav }: Props) => {
   const categoryTree = await getCategoryTree();
-  const webPages = await getHeaderWebPages();
+  const webPages = await getWebPagesWithChildren();
 
   return (
     <BaseHeaderNav
