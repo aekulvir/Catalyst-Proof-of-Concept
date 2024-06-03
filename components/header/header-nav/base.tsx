@@ -1,7 +1,6 @@
 'use client';
 
 import { ChevronDown, User } from 'lucide-react';
-
 import {
   NavigationMenuContent,
   NavigationMenuItem,
@@ -10,19 +9,23 @@ import {
   NavigationMenuTrigger,
 } from '@bigcommerce/components/navigation-menu';
 import { getCategoryTree } from '~/client/queries/get-category-tree';
+import { getHeaderWebPages } from '~/client/queries/ae/get-header-web-pages';
 import { Link } from '~/components/link';
 import { cn } from '~/lib/utils';
 
 type CategoryTree = Awaited<ReturnType<typeof getCategoryTree>>;
+type WebPages = Awaited<ReturnType<typeof getHeaderWebPages>>;
 
 export const BaseHeaderNav = ({
   className,
   inCollapsedNav = false,
   categoryTree,
+  webPages
 }: {
   className?: string;
   inCollapsedNav?: boolean;
   categoryTree: CategoryTree;
+  webPages: WebPages;
 }) => {
   return (
     <>
@@ -85,6 +88,56 @@ export const BaseHeaderNav = ({
                   className="text-ae-blue-100 cursor-pointer hover:text-ae-blue-100 hover:underline"
                 >
                     {category.name}
+                </Link>
+              </NavigationMenuLink>
+            )}
+          </NavigationMenuItem>
+        ))}
+        {webPages.map((webPage) => (
+          <NavigationMenuItem className={cn(inCollapsedNav && 'w-full')} key={webPage.path}>
+            {webPage.children.length > 0 ? (
+              <>
+                <NavigationMenuTrigger className="gap-0 p-0">
+                  <>
+                    <NavigationMenuLink asChild>
+                      <Link className="grow" href={webPage.path}>
+                        {webPage.name}
+                      </Link>
+                    </NavigationMenuLink>
+                    <span className={cn(inCollapsedNav && 'p-3')}>
+                      <ChevronDown
+                        aria-hidden="true"
+                        className={cn(
+                          'cursor-pointer transition duration-200 group-data-[state=open]/button:-rotate-180',
+                        )}
+                      />
+                    </span>
+                  </>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent
+                  className={cn(
+                    !inCollapsedNav && 'mx-auto flex w-[700px] flex-row gap-20 justify-start',
+                    inCollapsedNav && 'ps-3',
+                  )}
+                >
+                  {webPage.children.map((webPage1) => (
+                    <ul className={cn(inCollapsedNav && 'pb-4 justify-start')} key={webPage1.entityId}>
+                      <NavigationMenuItem>
+                        <NavigationMenuLink href={webPage1.path} className='capitalize'>
+                          {webPage1.name}
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    </ul>
+                  ))}
+                </NavigationMenuContent>
+              </>
+            ) : (
+              <NavigationMenuLink asChild>
+                <Link 
+                  href={webPage.path} 
+                  className="text-ae-blue-100 cursor-pointer hover:text-ae-blue-100 hover:underline capitalize"
+                >
+                    {webPage.name}
                 </Link>
               </NavigationMenuLink>
             )}
