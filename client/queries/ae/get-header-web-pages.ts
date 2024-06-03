@@ -55,8 +55,6 @@ export const getHeaderWebPages = async () => {
     const children = childPages.filter(page => page.parentEntityId == parentPage.entityId);
     return {...parentPage, children}
   });
-  
-  console.log("finalWebPages", finalWebPages);
 
   return finalWebPages;
 };
