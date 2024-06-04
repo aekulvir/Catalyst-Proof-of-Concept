@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { AvailableWebPages, getWebPages } from '~/client/queries/get-web-pages';
+import { AvailableWebPages, getFooterWebPages } from '~/client/queries/ae/get-web-pages-with-children';
 import { ExistingResultType } from '~/client/util';
 
 import { BaseFooterMenu } from './base-footer-menu';
@@ -21,7 +21,7 @@ const filterActivePages = (availableStorePages: AvailableWebPages) =>
     return visiblePages;
   }, []);
 
-type WebPages = ExistingResultType<typeof getWebPages>;
+type WebPages = ExistingResultType<typeof getFooterWebPages>;
 
 interface Props {
   webPages: WebPages;
