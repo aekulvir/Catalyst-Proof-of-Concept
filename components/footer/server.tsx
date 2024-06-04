@@ -1,9 +1,11 @@
 import { getInitialData } from '~/client/queries/get-initial-data';
+import { getFooterWebPages } from '~/client/queries/ae/get-web-pages-with-children';
 
 import { BaseFooter } from './base';
 
 export const Footer = async () => {
-  const { brands, categoryTree, storeSettings, webPages } = await getInitialData();
+  const webPages = await getFooterWebPages();
+  const { brands, categoryTree, storeSettings } = await getInitialData();
 
   return (
     <BaseFooter
