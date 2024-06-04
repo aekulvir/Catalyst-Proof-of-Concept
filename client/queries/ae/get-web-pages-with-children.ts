@@ -110,11 +110,9 @@ export const getFooterWebPages = async () => {
 
   const wepPagesAfterEdgesAndNodes = removeEdgesAndNodes(pages);
   const footerElement = wepPagesAfterEdgesAndNodes.filter(page => page.name == '--FOOTER--');
-  console.log("footerElement", footerElement);
   if (footerElement.length > 0) {
     const footerEntityId = footerElement[0]?.entityId;
     const footerPages = wepPagesAfterEdgesAndNodes.filter(page => page.parentEntityId == footerEntityId);
-    console.log("footerPages", footerPages);
     return footerPages;
   } else {
     return [];
